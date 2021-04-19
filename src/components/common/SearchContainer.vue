@@ -1,6 +1,6 @@
 <template>
-  <div class='searchcontainer'>
-    <slot name='querycd'></slot>
+  <div class='searchContainer'>
+    <slot name='queryCd'></slot>
   </div>
 </template>
 <script>
@@ -9,7 +9,7 @@ export default {
 }
 </script>
 <style scoped>
-  .searchcontainer {
+  .searchContainer {
     width: 100%;
     display: flex;
     flex-direction: row;
