@@ -11,7 +11,11 @@
           <a v-if="[item.key]=='projectName'" @click='handleProView(scope.row)'>{{scope.row.[item.key]}}</a>
           <a v-else-if="[item.key]=='caseNumber'" @click='handleCaseView(scope.row)'>{{scope.row.[item.key]}}</a>
           <a v-else-if="[item.key]=='passingRate'" @click='handlePassingView(scope.row)'>{{scope.row.[item.key]}}</a>
-          <a v-else-if="[item.key]=='certificated'" @click='handleCertificatedView(scope.row)'>{{scope.row.[item.key]}}</a>
+          <a
+            v-else-if="[item.key]=='certificated'"
+            @click='handleCertificatedView(scope.row)'
+            :class="{'font-red': scope.row.[item.key]=='不合格'}">
+            {{scope.row.[item.key]}}</a>
           <span v-else>{{scope.row.[item.key]}}</span>
         </template>
       </el-table-column>
@@ -21,11 +25,13 @@
             size='mini'
             type='primary'
             @click='handleEdit(scope.row)'
-          >编辑</el-button>
+            :disabled="scope.row.projectState=='已完成'||scope.row.projectState=='测试中'"
+            >编辑</el-button>
           <el-button
             size='mini'
             type='danger'
             @click='handleDelete(scope.row)'
+            :disabled="scope.row.projectState=='已完成'||scope.row.projectState=='测试中'"
             >删除</el-button>
         </template>
       </el-table-column>
@@ -129,5 +135,8 @@ export default {
   }
   a:hover {
     cursor: pointer;
+  }
+  .font-red {
+    color: red;
   }
 </style>

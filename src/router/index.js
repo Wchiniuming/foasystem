@@ -2,29 +2,35 @@ import {
   createRouter,
   createWebHistory
 } from 'vue-router'
-const vendor = () => import('../views/vendorview/VendorView')
-const newProject = () => import('../views/vendorview/NewProject')
-const caseDetails = () => import('../views/vendorview/CaseDetails')
+const projectList = () => import('@/views/vendorview/ProjectListView')
+const newProject = () => import('@/views/vendorview/NewProject')
+const caseDetails = () => import('@/views/vendorview/CaseDetails')
+const projectDetails = () => import('@/views/vendorview/ProjectDetails')
 
 const routes = [
   {
     path: '/',
-    redirect: '/vendor'
+    redirect: '/projectlist'
   },
   {
-    path: '/vendor',
-    name: 'vendor',
-    component: vendor
+    path: '/projectlist',
+    name: 'projectlist',
+    component: projectList
   },
   {
-    path: '/vendor/newproject',
+    path: '/newproject',
     name: 'newproject',
     component: newProject
   },
   {
-    path: '/vendor/casedetails/:projName',
+    path: '/casedetails/:projName',
     name: 'casedetails',
     component: caseDetails
+  },
+  {
+    path: '/projectdetails/:projName',
+    name: 'projectdetails',
+    component: projectDetails
   }
 ]
 

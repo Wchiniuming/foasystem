@@ -1,40 +1,42 @@
 <template>
-  <search-container>
-    <template v-slot:queryCd>
-      <el-form :inline="true" :model="caseQueryForm" ref='caseQueryForm' class="caseQuery-form">
-        <el-form-item label='产品名称'>
-          <el-input v-model="caseQueryForm.productName" placeholder="产品名称" clearable></el-input>
-        </el-form-item>
-        <el-form-item label='资费描述'>
-          <el-input v-model="caseQueryForm.tariffDesc" placeholder="资费描述" clearable></el-input>
-        </el-form-item>
-        <el-form-item label='测试号码'>
-          <el-input v-model="caseQueryForm.phoneNumber" placeholder="测试号码" clearable></el-input>
-        </el-form-item>
-        <el-form-item label='测试结果'>
-          <el-input v-model="caseQueryForm.testResult" placeholder="测试结果" clearable></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" icon='el-icon-search' @click="onQuery('caseQueryForm')">查询</el-button>
-        </el-form-item>
-      </el-form>
-    </template>
-  </search-container>
-  <div class="downLoadBt">
-    <el-button type='text' @click="multiDownLoad">批量下载</el-button>
-    <el-button type='text' @click="allDownLoad">下载全部用例</el-button>
+  <div>
+    <search-container>
+      <template v-slot:queryCd>
+        <el-form :inline="true" :model="caseQueryForm" ref='caseQueryForm' class="caseQuery-form">
+          <el-form-item label='产品名称'>
+            <el-input v-model="caseQueryForm.productName" placeholder="产品名称" clearable></el-input>
+          </el-form-item>
+          <el-form-item label='资费描述'>
+            <el-input v-model="caseQueryForm.tariffDesc" placeholder="资费描述" clearable></el-input>
+          </el-form-item>
+          <el-form-item label='测试号码'>
+            <el-input v-model="caseQueryForm.phoneNumber" placeholder="测试号码" clearable></el-input>
+          </el-form-item>
+          <el-form-item label='测试结果'>
+            <el-input v-model="caseQueryForm.testResult" placeholder="测试结果" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" icon='el-icon-search' @click="onQuery('caseQueryForm')">查询</el-button>
+          </el-form-item>
+        </el-form>
+      </template>
+    </search-container>
+    <div class="downLoadBt">
+      <el-button type='text' @click="multiDownLoad">批量下载</el-button>
+      <el-button type='text' @click="allDownLoad">下载全部用例</el-button>
+    </div>
+    <table-list
+      :tableHeaders='tableHeaders'
+      :tableData='caseData'
+      :selectable='true'
+      @multiSelect='selectCases'
+    ></table-list>
   </div>
-  <table-list
-    :tableHeaders='tableHeaders'
-    :tableData='caseData'
-    :selectable='true'
-    @multiSelect='selectCases'
-  ></table-list>
 </template>
 
 <script>
-import SearchContainer from '../../components/common/SearchContainer'
-import TableList from '../../components/common/TableList'
+import SearchContainer from '@/components/common/SearchContainer'
+import TableList from '@/components/common/TableList'
 
 export default {
   name: 'CaseDetails',

@@ -2,7 +2,7 @@
   <el-container>
     <el-aside style="width: 5%">
       <div>
-        <router-link to='/vendor'>厂商</router-link>
+        <router-link to='/'>厂商</router-link>
       </div>
       <!-- <div>
         <router-link to='/tester'>测试方</router-link>
@@ -24,7 +24,7 @@ export default {
 </script>
 
 <style>
-@import url('/src/assets/css/normalize.css');
+@import url('/@/assets/css/normalize.css');
 
 .el-aside {
   padding-top: 10px;
