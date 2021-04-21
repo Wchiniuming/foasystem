@@ -79,6 +79,9 @@ export default {
   methods: {
     goBack () {
       this.$router.back()
+    },
+    doDownload (name) {
+      // 文件下载
     }
   },
   beforeMount () {

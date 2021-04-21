@@ -18,18 +18,25 @@
             </el-form-item>
           </el-col>
         </el-form-item>
-        <el-form-item label="状态" prop="projectState">
-          <el-select v-model="createForm.projectState" placeholder="项目状态">
-            <el-option label="测试中" value="测试中"></el-option>
-            <el-option label="已申请" value="已申请"></el-option>
-            <el-option label="已完成" value="已完成"></el-option>
-          </el-select>
+        <el-form-item label="系统开发商" prop="systemDeveloper">
+          <el-input v-model="createForm.systemDeveloper" placeholder='系统开发商'></el-input>
         </el-form-item>
         <el-form-item label="预计完成时间" prop="expectedDate">
           <el-date-picker type="date" placeholder="预计完成时间" v-model="createForm.expectedDate" style="width: 42%;"></el-date-picker>
         </el-form-item>
-        <el-form-item label="紧急度" prop="emergencyLevel">
-          <el-input v-model="createForm.emergencyLevel" placeholder='紧急度' style="width: 42%"></el-input>
+        <el-form-item label="状态" prop="projectState">
+          <el-col :span='8'>
+            <el-select v-model="createForm.projectState" placeholder="项目状态">
+              <el-option label="测试中" value="测试中"></el-option>
+              <el-option label="已申请" value="已申请"></el-option>
+              <el-option label="已完成" value="已完成"></el-option>
+            </el-select>
+          </el-col>
+          <el-col :span='16'>
+          <el-form-item label="紧急度" prop="emergencyLevel">
+            <el-input v-model="createForm.emergencyLevel" placeholder='紧急度' ></el-input>
+          </el-form-item>
+        </el-col>
         </el-form-item>
         <el-form-item label="项目描述" prop="projectDesc" style="width: 100%">
           <el-input type="textarea" placeholder='项目描述' :autosize='{minRows: 5, maxRows: 10}' v-model="createForm.projectDesc" style="width: 100%"></el-input>
@@ -60,6 +67,8 @@
 </template>
 
 <script>
+import { projectCreateFormRules } from '@/common/FormRules'
+
 export default {
   name: 'NewProject',
   data () {
@@ -71,28 +80,10 @@ export default {
         projectState: '',
         expectedDate: '',
         emergencyLevel: '',
-        projectDesc: ''
+        projectDesc: '',
+        systemDeveloper: ''
       },
-      rules: {
-        projectName: [
-          { required: true, message: '该项目必填', trigger: 'blur' }
-        ],
-        targetSystem: [
-          { required: true, message: '该项目必填', trigger: 'blur' }
-        ],
-        systemVersion: [
-          { required: true, message: '该项目必填', trigger: 'blur' }
-        ],
-        projectType: [
-          { required: true, message: '该项目必填', trigger: 'change' }
-        ],
-        expectedDate: [
-          { type: 'date', required: true, message: '该项目必填', trigger: 'blur' }
-        ],
-        projectState: [
-          { required: true, message: '该项目必填' }
-        ]
-      },
+      rules: {},
       fileList: [
         {
           name: 'ccc.dox',
@@ -126,6 +117,9 @@ export default {
     beforeRemove (file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
     }
+  },
+  created () {
+    this.rules = projectCreateFormRules
   }
 }
 </script>

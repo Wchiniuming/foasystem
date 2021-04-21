@@ -10,7 +10,7 @@
             <el-input v-model="caseQueryForm.tariffDesc" placeholder="资费描述" clearable></el-input>
           </el-form-item>
           <el-form-item label='测试号码'>
-            <el-input v-model="caseQueryForm.phoneNumber" placeholder="测试号码" clearable></el-input>
+            <el-input v-model="caseQueryForm.testPhoneNumber" placeholder="测试号码" clearable></el-input>
           </el-form-item>
           <el-form-item label='测试结果'>
             <el-input v-model="caseQueryForm.testResult" placeholder="测试结果" clearable></el-input>
@@ -27,7 +27,7 @@
     </div>
     <table-list
       :tableHeaders='tableHeaders'
-      :tableData='caseData'
+      :tableData='caseDataProps'
       :selectable='true'
       @multiSelect='selectCases'
     ></table-list>
@@ -37,6 +37,7 @@
 <script>
 import SearchContainer from '@/components/common/SearchContainer'
 import TableList from '@/components/common/TableList'
+import { CaseDetailsHeader } from '@/common/TableHeaders'
 
 export default {
   name: 'CaseDetails',
@@ -46,64 +47,7 @@ export default {
   },
   data () {
     return {
-      tableHeaders: [
-        {
-          key: 'sn',
-          name: '序号'
-        },
-        {
-          key: 'productName',
-          name: '产品名称'
-        },
-        {
-          key: 'tariffDesc',
-          name: '资费描述'
-        },
-        {
-          key: 'subSceneOne',
-          name: '子场景一'
-        },
-        {
-          key: 'subSceneTwo',
-          name: '子场景二'
-        },
-        {
-          key: 'subSceneThree',
-          name: '子场景三'
-        },
-        {
-          key: 'subSceneFour',
-          name: '子场景四'
-        },
-        {
-          key: 'productId',
-          name: '产品ID'
-        },
-        {
-          key: 'testPhoneNumber',
-          name: '测试号码'
-        },
-        {
-          key: 'callingTime',
-          name: '话单时长'
-        },
-        {
-          key: 'initialTariff',
-          name: '免费资费初始值'
-        },
-        {
-          key: 'testResult',
-          name: '测试结果'
-        },
-        {
-          key: 'noPassReason',
-          name: '测试失败原因'
-        },
-        {
-          key: 'remarks',
-          name: '备注'
-        }
-      ],
+      tableHeaders: [],
       caseData: [
         {
           sn: 1,
@@ -138,10 +82,11 @@ export default {
           remarks: ''
         }
       ],
+      caseDataProps: [],
       caseQueryForm: {
         productName: '',
         tariffDesc: '',
-        phoneNumber: '',
+        testPhoneNumber: '',
         testResult: ''
       },
       selectedCases: []
@@ -153,7 +98,27 @@ export default {
       console.log(this.selectedCases)
     },
     multiDownLoad () {},
-    allDownLoad () {}
+    allDownLoad () {},
+    onQuery (formName) {
+      const qf = this.caseQueryForm
+      if (Object.keys(qf).length === 0) {
+        this.caseDataProps = this.caseData
+      } else {
+        this.caseDataProps = this.caseData.filter(
+          casesItem => {
+            return casesItem.productName.match(qf.productName) &&
+            casesItem.tariffDesc.match(qf.tariffDesc) &&
+            casesItem.testPhoneNumber.match(qf.testPhoneNumber) &&
+            casesItem.testResult.match(qf.testResult)
+          }
+        )
+      }
+    }
+  },
+  created () {
+    this.tableHeaders = CaseDetailsHeader
+    this.caseDataProps = this.caseData
+    // 根据路由中携带的参数，到后端查询指定项目的用例数据，赋值给this.caseData
   }
 }
 </script>

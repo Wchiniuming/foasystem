@@ -30,7 +30,7 @@
           <el-button
             size='mini'
             type='danger'
-            @click='handleDelete(scope.row)'
+            @click='handleDelete(scope.$index, scope.row)'
             :disabled="scope.row.projectState=='已完成'||scope.row.projectState=='测试中'"
             >删除</el-button>
         </template>
@@ -86,8 +86,8 @@ export default {
     handleEdit (row) {
       this.$emit('edit', row)
     },
-    handleDelete (row) {
-      this.$emit('delete', row)
+    handleDelete (index, row) {
+      this.$emit('delete', index, row)
     },
     // 查看和审批
     handleView (row) {
