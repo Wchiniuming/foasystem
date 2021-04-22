@@ -36,7 +36,7 @@ const routes = [
     component: projectDetails
   },
   {
-    path: '/casesmaintain',
+    path: '/casesmaintain/:projectName',
     name: 'casesMaintain',
     component: casesMaintain
   },

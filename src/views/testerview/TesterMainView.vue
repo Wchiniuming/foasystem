@@ -103,7 +103,20 @@ export default {
     resetForm (formName) {
       this.$refs[formName].resetFields()
     },
-    onQuery (formName) {}
+    onQuery (formName) {},
+    uploadCase (row) {
+      this.router.push({
+        name: 'casesMaintain',
+        params: { projectName: row.projectName, projectId: row.projectId }
+      })
+    },
+    uploadResult (row) {
+      this.router.push({
+        name: 'testResult',
+        params: { projectName: row.projectName, projectId: row.projectId }
+      })
+    },
+    issueLicense (row) {}
   }
 }
 </script>
