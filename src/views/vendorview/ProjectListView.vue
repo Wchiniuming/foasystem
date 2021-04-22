@@ -3,16 +3,16 @@
     <search-container>
       <template v-slot:queryCd>
         <el-form :inline="true" :model="projQueryForm" ref='projQueryForm' class="projQuery-form" style="width:100%">
-          <el-col :span='22' style="width: 100%">
-            <el-col :span='12'>
-              <el-form-item label='项目名称'>
+          <el-col :span='20' style="width: 100%">
+            <el-col :span='13' style="width: 100%">
+              <el-form-item label='项目名称' prop='projectName'>
                 <el-input v-model="projQueryForm.projectName" placeholder="项目名称" class='itemInput' clearable></el-input>
               </el-form-item>
-              <el-form-item label='系统'>
-                <el-input v-model="projQueryForm.targetSystem" placeholder="测试系统" class='itemInput' clearable></el-input>
+              <el-form-item label='产品' prop='productName'>
+                <el-input v-model="projQueryForm.productName" placeholder="产品" class='itemInput' clearable></el-input>
               </el-form-item>
-              <el-form-item label="状态">
-                <el-select v-model="projQueryForm.projectState" class='itemInput' placeholder="状态" clearable>
+              <el-form-item label="状态" prop='status'>
+                <el-select v-model="projQueryForm.status" class='itemInput' placeholder="状态" clearable>
                   <el-option label="已完成" value="已完成"></el-option>
                   <el-option label="申请中" value="申请中"></el-option>
                   <el-option label="申请失败" value="申请失败"></el-option>
@@ -20,27 +20,32 @@
                 </el-select>
               </el-form-item>
             </el-col>
-            <el-col :span='10' style="width: 100%">
+            <el-col :span='11' style="width: 100%">
               <el-form-item label='创建时间'>
-                <el-date-picker
-                  v-model='projQueryForm.beginDate'
-                  type='date'
-                  placeholder='创建时间'
-                  >
-                </el-date-picker>
+                <el-form-item prop='beginDate'>
+                  <el-date-picker
+                    v-model='projQueryForm.beginDate'
+                    type='date'
+                    placeholder='创建时间'
+                    >
+                  </el-date-picker>
+                </el-form-item>
                 <span>-</span>
-                <el-date-picker
-                  v-model='projQueryForm.endDate'
-                  type='date'
-                  placeholder='结束时间'
-                  >
-                </el-date-picker>
+                <el-form-item  prop='endDate'>
+                  <el-date-picker
+                    v-model='projQueryForm.endDate'
+                    type='date'
+                    placeholder='结束时间'
+                    >
+                  </el-date-picker>
+                </el-form-item>
               </el-form-item>
             </el-col>
           </el-col>
-          <el-col :span='2' style="width: 100%">
+          <el-col :span='4' style="width: 100%">
             <el-form-item class='queryBt'>
               <el-button type="primary" small icon='el-icon-search' @click="onQuery('projQueryForm')">查询</el-button>
+              <el-button type="info" small icon='el-icon-refresh' @click="resetForm('projQueryForm')">重置</el-button>
             </el-form-item>
           </el-col>
         </el-form>
@@ -72,31 +77,31 @@
           <el-form-item label="项目名称" prop="projectName">
             <el-input v-model="projectEditingForm.projectName" style="width: 42%" placeholder='项目名称'></el-input>
           </el-form-item>
-          <el-form-item label="测试系统" prop="targetSystem">
+          <el-form-item label="产品" prop="productName">
             <el-col :span='8'>
-              <el-input v-model="projectEditingForm.targetSystem" placeholder='测试系统'></el-input>
+              <el-input v-model="projectEditingForm.productName" placeholder='产品'></el-input>
             </el-col>
             <el-col :span='16'>
-              <el-form-item label="版本" prop="systemVersion">
-                <el-input v-model="projectEditingForm.systemVersion" placeholder='系统版本'></el-input>
+              <el-form-item label="版本" prop="productVer">
+                <el-input v-model="projectEditingForm.productVer" placeholder='版本'></el-input>
               </el-form-item>
             </el-col>
           </el-form-item>
-          <el-form-item label="系统开发商" prop="systemDeveloper">
-            <el-input v-model="projectEditingForm.systemDeveloper" placeholder='系统开发商' style="width: 42%"></el-input>
+          <el-form-item label="产品开发商" prop="company">
+            <el-input v-model="projectEditingForm.company" placeholder='产品开发商' style="width: 42%"></el-input>
           </el-form-item>
-          <el-form-item label="状态" prop="projectState">
-            <el-select v-model="projectEditingForm.projectState" placeholder="项目状态">
+          <el-form-item label="状态" prop="status">
+            <el-select v-model="projectEditingForm.status" placeholder="项目状态">
               <el-option label="测试中" value="测试中"></el-option>
               <el-option label="已申请" value="已申请"></el-option>
               <el-option label="已完成" value="已完成"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="预计完成时间" prop="expectedDate">
-            <el-date-picker type="date" placeholder="预计完成时间" v-model="projectEditingForm.expectedDate" style="width: 42%;"></el-date-picker>
+          <el-form-item label="预计完成时间" prop="finishedTime">
+            <el-date-picker type="date" placeholder="预计完成时间" v-model="projectEditingForm.finishedTime" style="width: 42%;"></el-date-picker>
           </el-form-item>
-          <el-form-item label="紧急度" prop="emergencyLevel">
-            <el-input v-model="projectEditingForm.emergencyLevel" placeholder='紧急度' style="width: 42%"></el-input>
+          <el-form-item label="紧急度" prop="projectLevel">
+            <el-input v-model="projectEditingForm.projectLevel" placeholder='紧急度' style="width: 42%"></el-input>
           </el-form-item>
           <el-form-item label="入网许可" prop="certificated">
             <el-select v-model="projectEditingForm.certificated" placeholder="入网许可">
@@ -104,8 +109,8 @@
               <el-option label="不合格" value="不合格"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="项目描述" prop="projectDesc" style="width: 100%">
-            <el-input type="textarea" placeholder='项目描述' :autosize='{minRows: 5, maxRows: 10}' v-model="projectEditingForm.projectDesc" style="width: 100%"></el-input>
+          <el-form-item label="项目描述" prop="description" style="width: 100%">
+            <el-input type="textarea" placeholder='项目描述' :autosize='{minRows: 5, maxRows: 10}' v-model="projectEditingForm.description" style="width: 100%"></el-input>
           </el-form-item>
         </el-form>
       <template #footer>
@@ -153,8 +158,8 @@ export default {
       // 查询窗口的属性信息
       projQueryForm: {
         projectName: '',
-        targetSystem: '',
-        projectState: '',
+        productName: '',
+        status: '',
         beginDate: '',
         endDate: ''
       },
@@ -163,115 +168,123 @@ export default {
       projectData: [
         {
           projectName: '测试项目1',
-          targetSystem: 'BOSS',
-          systemVersion: 'V1.2',
-          createdDateTime: '2020/11/19 08:25:36',
-          projectState: '已完成',
-          caseNumber: 100,
-          passingRate: '100%',
+          productName: 'BOSS',
+          productVer: 'V1.2',
+          createTime: '2020/11/19 08:25:36',
+          status: '已完成',
+          numOfCase: 100,
+          passRate: '100%',
           certificated: '已获得',
-          systemDeveloper: '华为',
-          projectDesc: '',
-          emergencyLevel: '',
-          expectedDate: ''
+          company: '华为',
+          description: '紧急',
+          projectLevel: '紧急',
+          finishedTime: '2020/11/19 08:25:36',
+          contactMan: '奥恩'
         },
         {
           projectName: '测试项目2',
-          targetSystem: 'BOSS',
-          systemVersion: 'V1.2',
-          createdDateTime: '2021/3/19 08:25:36',
-          projectState: '已完成',
-          caseNumber: 100,
-          passingRate: '50%',
+          productName: 'BOSS',
+          productVer: 'V1.2',
+          createTime: '2021/3/19 08:25:36',
+          status: '已完成',
+          numOfCase: 100,
+          passRate: '50%',
           certificated: '不合格',
-          systemDeveloper: '华为',
-          projectDesc: '',
-          emergencyLevel: '',
-          expectedDate: ''
+          company: '华为',
+          description: '紧急',
+          projectLevel: '紧急',
+          finishedTime: '2020/11/19 08:25:36',
+          contactMan: '奥恩'
         },
         {
           projectName: '测试项目3',
-          targetSystem: 'BOSS',
-          systemVersion: 'V1.2',
-          createdDateTime: '2020/11/19 08:25:36',
-          projectState: '申请失败',
-          caseNumber: 100,
-          passingRate: '100%',
+          productName: 'BOSS',
+          productVer: 'V1.2',
+          createTime: '2020/11/19 08:25:36',
+          status: '申请失败',
+          numOfCase: 100,
+          passRate: '100%',
           certificated: '已获得',
-          systemDeveloper: '华为',
-          projectDesc: '',
-          emergencyLevel: '',
-          expectedDate: ''
+          company: '华为',
+          description: '紧急',
+          projectLevel: '紧急',
+          finishedTime: '2020/11/19 08:25:36',
+          contactMan: '奥恩'
         },
         {
           projectName: '测试项目4',
-          targetSystem: 'BOSS',
-          systemVersion: 'V1.2',
-          createdDateTime: '2020/11/19 08:25:36',
-          projectState: '申请中',
-          caseNumber: 100,
-          passingRate: '80%',
+          productName: 'BOSS',
+          productVer: 'V1.2',
+          createTime: '2020/11/19 08:25:36',
+          status: '申请中',
+          numOfCase: 100,
+          passRate: '80%',
           certificated: '不合格',
-          systemDeveloper: '思特奇',
-          projectDesc: '',
-          emergencyLevel: '',
-          expectedDate: ''
+          company: '思特奇',
+          description: '紧急',
+          projectLevel: '紧急',
+          finishedTime: '2020/11/19 08:25:36',
+          contactMan: '奥恩'
         },
         {
           projectName: '测试项目5',
-          targetSystem: 'BOSS',
-          systemVersion: 'V1.2',
-          createdDateTime: '2020/11/19 08:25:36',
-          projectState: '测试中',
-          caseNumber: 100,
-          passingRate: '100%',
+          productName: 'BOSS',
+          productVer: 'V1.2',
+          createTime: '2020/11/19 08:25:36',
+          status: '测试中',
+          numOfCase: 100,
+          passRate: '100%',
           certificated: '已获得',
-          systemDeveloper: '亚信',
-          projectDesc: '',
-          emergencyLevel: '',
-          expectedDate: ''
+          company: '亚信',
+          description: '紧急',
+          projectLevel: '紧急',
+          finishedTime: '2020/11/19 08:25:36',
+          contactMan: '奥恩'
         },
         {
           projectName: '测试项目6',
-          targetSystem: 'BOSS',
-          systemVersion: 'V1.2',
-          createdDateTime: '2020/11/19 08:25:36',
-          projectState: '已完成',
-          caseNumber: 100,
-          passingRate: '100%',
+          productName: 'BOSS',
+          productVer: 'V1.2',
+          createTime: '2020/11/19 08:25:36',
+          status: '已完成',
+          numOfCase: 100,
+          passRate: '100%',
           certificated: '已获得',
-          systemDeveloper: '亚信',
-          projectDesc: '',
-          emergencyLevel: '',
-          expectedDate: ''
+          company: '亚信',
+          description: '紧急',
+          projectLevel: '紧急',
+          finishedTime: '2020/11/19 08:25:36',
+          contactMan: '奥恩'
         },
         {
           projectName: '测试项目7',
-          targetSystem: 'BOSS',
-          systemVersion: 'V1.2',
-          createdDateTime: '2020/11/19 08:25:36',
-          projectState: '申请中',
-          caseNumber: 100,
-          passingRate: '100%',
+          productName: 'BOSS',
+          productVer: 'V1.2',
+          createTime: '2020/11/19 08:25:36',
+          status: '申请中',
+          numOfCase: 100,
+          passRate: '100%',
           certificated: '已获得',
-          systemDeveloper: '亚信',
-          projectDesc: '',
-          emergencyLevel: '',
-          expectedDate: ''
+          company: '亚信',
+          description: '紧急',
+          projectLevel: '紧急',
+          finishedTime: '2020/11/19 08:25:36',
+          contactMan: '奥恩'
         },
         {
           projectName: '测试项目8',
-          targetSystem: 'BOSS',
-          systemVersion: 'V1.2',
-          createdDateTime: '2020/11/19 08:25:36',
-          projectState: '测试中',
-          caseNumber: 100,
-          passingRate: '100%',
+          productName: 'BOSS',
+          productVer: 'V1.2',
+          createTime: '2020/11/19 08:25:36',
+          status: '测试中',
+          numOfCase: 100,
+          passRate: '100%',
           certificated: '已获得',
-          systemDeveloper: '亚信',
-          projectDesc: '',
-          emergencyLevel: '',
-          expectedDate: ''
+          company: '亚信',
+          description: '紧急',
+          projectLevel: '紧急',
+          finishedTime: '2020/11/19 08:25:36',
+          contactMan: '奥恩'
         }
       ]
     }
@@ -289,48 +302,51 @@ export default {
     onQuery (formName) {
       const pqf = this.projQueryForm
       // 需要先判断是否为null，再判断长度是否为0
-      const notNull = pqf.projectName.length === 0 && pqf.targetSystem.length === 0 && pqf.projectState.length === 0 && (pqf.beginDate === null || pqf.beginDate.length === 0) && (pqf.endDate === null || pqf.endDate.length === 0)
+      const notNull = pqf.projectName.length === 0 && pqf.productName.length === 0 && pqf.status.length === 0 && (pqf.beginDate === null || pqf.beginDate.length === 0) && (pqf.endDate === null || pqf.endDate.length === 0)
       if (notNull) {
         this.projectDataProps = this.projectData
       } else if ((pqf.beginDate === null || pqf.beginDate.length === 0) && (pqf.endDate === null || pqf.endDate.length === 0)) {
         this.projectDataProps = this.projectData
           .filter(project => {
             return project.projectName.match(pqf.projectName) &&
-            project.targetSystem.match(pqf.targetSystem) &&
-            project.projectState.match(pqf.projectState)
+            project.productName.match(pqf.productName) &&
+            project.status.match(pqf.status)
           })
       } else if (((pqf.beginDate !== null && pqf.beginDate.length !== 0) && (pqf.endDate !== null && pqf.endDate.length !== 0))) {
         this.projectDataProps = this.projectData
           .filter(project => {
             return project.projectName.match(pqf.projectName) &&
-            project.targetSystem.match(pqf.targetSystem) &&
-            project.projectState.match(pqf.projectState) &&
-            new Date(project.createdDateTime) >= new Date(pqf.beginDate) &&
-            new Date(project.createdDateTime) <= new Date(pqf.endDate)
+            project.productName.match(pqf.productName) &&
+            project.status.match(pqf.status) &&
+            new Date(project.createTime) >= new Date(pqf.beginDate) &&
+            new Date(project.createTime) <= new Date(pqf.endDate)
           })
       } else if ((pqf.beginDate === null || pqf.beginDate.length === 0) && (pqf.endDate !== null || pqf.endDate.length !== 0)) {
         this.projectDataProps = this.projectData
           .filter(project => {
             return project.projectName.match(pqf.projectName) &&
-            project.targetSystem.match(pqf.targetSystem) &&
-            project.projectState.match(pqf.projectState) &&
-            new Date(project.createdDateTime) <= new Date(pqf.endDate)
+            project.productName.match(pqf.productName) &&
+            project.status.match(pqf.status) &&
+            new Date(project.createTime) <= new Date(pqf.endDate)
           })
       } else if ((pqf.beginDate !== null && pqf.beginDate.length !== 0) && (pqf.endDate === null || pqf.endDate.length === 0)) {
         this.projectDataProps = this.projectData
           .filter(project => {
             return project.projectName.match(pqf.projectName) &&
-            project.targetSystem.match(pqf.targetSystem) &&
-            project.projectState.match(pqf.projectState) &&
-            new Date(project.createdDateTime) >= new Date(pqf.beginDate)
+            project.productName.match(pqf.productName) &&
+            project.status.match(pqf.status) &&
+            new Date(project.createTime) >= new Date(pqf.beginDate)
           })
       } else {
         this.projectDataProps = this.projectData
       }
     },
+    resetForm (formName) {
+      this.$refs[formName].resetFields()
+    },
     newProject () {
       this.$router.push({
-        name: 'newproject'
+        name: 'newProject'
       })
     },
     editProject (row) {
@@ -352,21 +368,29 @@ export default {
     viewProjectDetails (row) {
       this.$router.push(
         {
-          name: 'projectdetails',
-          params: { projName: row.projectName }
+          name: 'projectDetails',
+          params: { projectId: row.projectId }
         }
       )
     },
     viewCaseDetails (row) {
       this.$router.push(
         {
-          name: 'casedetails',
-          params: { projName: row.projectName }
+          name: 'caseDetailsView',
+          params: { projectName: row.projectName }
         }
       )
     },
     viewTestResult (row) {
-      console.log(row)
+      this.$router.push(
+        {
+          name: 'testResult',
+          params: {
+            projectName: row.projectName,
+            data: JSON.stringify(row)
+          }
+        }
+      )
     },
     viewCertification (row) {
       if (row.certificated === '已获得') {

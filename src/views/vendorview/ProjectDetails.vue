@@ -21,26 +21,26 @@
           </span>
         </el-form-item>
         <el-form-item label="厂商:">
-          <label class="projectItem">{{projectInfo.vendorName}}</label>
+          <label class="projectItem">{{projectInfo.company}}</label>
         </el-form-item>
         <el-form-item label="待上线省份:">
           <label class="projectItem">{{projectInfo.province}}</label>
         </el-form-item>
-        <el-form-item label="测试系统:">
-          <label class="projectItem">{{projectInfo.targetSystem}}</label>
+        <el-form-item label="测试产品:">
+          <label class="projectItem">{{projectInfo.productName}}</label>
         </el-form-item>
-        <el-form-item label="系统类型:">
-          <label class="projectItem">{{projectInfo.systemType}}</label>
+        <el-form-item label="接口人信息:">
+          <label class="projectItem">{{projectInfo.contactMan}}</label>
         </el-form-item>
         <el-form-item label="紧急程度:" style="font-weight: bolder;">
-          <label class="projectItem">{{projectInfo.emergencyLevel}}</label>
+          <label class="projectItem">{{projectInfo.projectLevel}}</label>
         </el-form-item>
         <el-form-item label="附件:">
-          <div v-for="annex in projectInfo.annexes" :key="annex.name">
+          <div v-for="file in annexes" :key="file.fileName">
             <ul style="list-style: none;">
               <li>
-                <span style="margin-right: 10px">{{annex.name}}</span>
-                <el-button type='text' @click="doDownload(annex.name)">下载</el-button>
+                <span style="margin-right: 10px">{{file.fileName}}</span>
+                <el-button type='text' @click="doDownload(file.fileName)">下载</el-button>
               </li>
             </ul>
           </div>
@@ -58,22 +58,23 @@ export default {
       projectInfo: {},
       projectDt: {
         projectName: '测试项目1',
-        vendorName: '厂商1',
+        company: '厂商1',
         province: '省公司1',
-        targetSystem: '系统1',
-        systemType: 'BOSS',
-        emergencyLevel: '紧急',
-        annexes: [
-          {
-            name: '1.山东BOSS升级说明.docx',
-            type: 'docx'
-          },
-          {
-            name: '2.山东BOSS升级说明2.docx',
-            type: 'docx'
-          }
-        ]
-      }
+        productName: '产品1',
+        contactMan: '接口人',
+        projectLevel: '紧急'
+      },
+      // 附件的数据，通过projectId发送请求，到后端获取
+      annexes: [
+        {
+          projectId: '1',
+          fileName: '1.山东BOSS升级说明.docx'
+        },
+        {
+          projectId: '2',
+          fileName: '2.山东BOSS升级说明2.docx'
+        }
+      ]
     }
   },
   methods: {
@@ -83,6 +84,9 @@ export default {
     doDownload (name) {
       // 文件下载
     }
+  },
+  created () {
+    // 从路由中获取projectId，请求获取相应的附件列表，并赋值给annexes
   },
   beforeMount () {
     this.projectInfo = this.projectDt

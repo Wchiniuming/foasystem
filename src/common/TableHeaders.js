@@ -4,27 +4,31 @@ export const projectListTableHeader = [
     name: '测试项目'
   },
   {
-    key: 'targetSystem',
-    name: '测试系统'
+    key: 'productName',
+    name: '产品名称'
   },
   {
-    key: 'systemVersion',
-    name: '版本'
+    key: 'contactMan',
+    name: '接口人'
   },
   {
-    key: 'createdDateTime',
+    key: 'createTime',
     name: '创建时间'
   },
   {
-    key: 'projectState',
+    key: 'status',
     name: '状态'
   },
   {
-    key: 'caseNumber',
+    key: 'finishedTime',
+    name: '完成时间'
+  },
+  {
+    key: 'numOfCase',
     name: '用例数'
   },
   {
-    key: 'passingRate',
+    key: 'passRate',
     name: '通过率'
   },
   {
@@ -32,62 +36,146 @@ export const projectListTableHeader = [
     name: '入网许可'
   }
 ]
-
 export const CaseDetailsHeader = [
   {
-    key: 'sn',
-    name: '序号'
+    key: 'useCaseId',
+    name: '用例编号'
   },
   {
-    key: 'productName',
-    name: '产品名称'
+    key: 'module1',
+    name: '模块一'
   },
   {
-    key: 'tariffDesc',
-    name: '资费描述'
+    key: 'module2',
+    name: '模块二'
   },
   {
-    key: 'subSceneOne',
-    name: '子场景一'
+    key: 'module3',
+    name: '模块三'
   },
   {
-    key: 'subSceneTwo',
-    name: '子场景二'
+    key: 'module4',
+    name: '模块四'
   },
   {
-    key: 'subSceneThree',
-    name: '子场景三'
+    key: 'useCaseName',
+    name: '用例名称'
   },
   {
-    key: 'subSceneFour',
-    name: '子场景四'
+    key: 'purpose',
+    name: '测试目的'
   },
   {
-    key: 'productId',
-    name: '产品ID'
+    key: 'beforeTest',
+    name: '预置条件'
   },
   {
-    key: 'testPhoneNumber',
-    name: '测试号码'
+    key: 'steps',
+    name: '测试步骤'
   },
   {
-    key: 'callingTime',
-    name: '话单时长'
+    key: 'expectResult',
+    name: '预期结果'
   },
   {
-    key: 'initialTariff',
-    name: '免费资费初始值'
-  },
-  {
-    key: 'testResult',
+    key: 'result',
     name: '测试结果'
   },
   {
-    key: 'noPassReason',
-    name: '测试失败原因'
+    key: 'testMan',
+    name: '测试人员'
   },
   {
-    key: 'remarks',
-    name: '备注'
+    key: 'testTime',
+    name: '测试日期'
+  }
+]
+export const casesMaintainHeaders = [
+  {
+    key: 'useCaseId',
+    name: '用例编号'
+  },
+  {
+    key: 'module1',
+    name: '模块一'
+  },
+  {
+    key: 'module2',
+    name: '模块二'
+  },
+  {
+    key: 'module3',
+    name: '模块三'
+  },
+  {
+    key: 'module4',
+    name: '模块四'
+  },
+  {
+    key: 'useCaseName',
+    name: '用例名称'
+  },
+  {
+    key: 'purpose',
+    name: '测试目的'
+  },
+  {
+    key: 'beforeTest',
+    name: '预置条件'
+  },
+  {
+    key: 'steps',
+    name: '测试步骤'
+  },
+  {
+    key: 'expectResult',
+    name: '预期结果'
+  }
+]
+export const testMainViewHeaders = [
+  {
+    key: 'projectName',
+    name: '测试项目'
+  },
+  {
+    key: 'company',
+    name: '厂商'
+  },
+  {
+    key: 'productVer',
+    name: '版本'
+  },
+  {
+    key: 'contactMan',
+    name: '接口人'
+  },
+  {
+    key: 'createTime',
+    name: '创建时间'
+  },
+  {
+    key: 'status',
+    name: '状态'
+  },
+  {
+    key: 'finishedTime',
+    name: '完成时间'
+  },
+  {
+    key: 'numOfCase',
+    name: '用例数'
+  },
+  {
+    key: 'passRate',
+    name: '通过率'
+  },
+  {
+    key: 'certificated',
+    name: '入网许可'
+  },
+  {
+    key: 'principal',
+    name: '测试负责人',
+    type: Array
   }
 ]

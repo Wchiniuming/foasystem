@@ -2,25 +2,25 @@ export const projectEditFormRules = {
   projectName: [
     { required: true, message: '该项目必填', trigger: 'blur' }
   ],
-  targetSystem: [
+  productName: [
     { required: true, message: '该项目必填', trigger: 'blur' }
   ],
-  systemVersion: [
+  productVer: [
     { required: true, message: '该项目必填', trigger: 'blur' }
   ],
-  projectState: [
+  status: [
     { required: true, message: '该项目必填' }
   ],
-  expectedDate: [
+  finishedTime: [
     { type: 'date', required: true, message: '该项目必填', trigger: 'blur' }
   ],
-  emergencyLevel: [
+  projectLevel: [
     { required: true, message: '该项目必填', trigger: 'blur' }
   ],
   certificated: [
     { required: true, message: '该项目必填', trigger: 'blur' }
   ],
-  systemDeveloper: [
+  company: [
     { required: true, message: '该项目必填', trigger: 'blur' }
   ]
 }
@@ -29,19 +29,19 @@ export const projectCreateFormRules = {
   projectName: [
     { required: true, message: '该项目必填', trigger: 'blur' }
   ],
-  targetSystem: [
+  productName: [
     { required: true, message: '该项目必填', trigger: 'blur' }
   ],
-  systemVersion: [
+  productVer: [
     { required: true, message: '该项目必填', trigger: 'blur' }
   ],
-  expectedDate: [
+  finishedTime: [
     { type: 'date', required: true, message: '该项目必填', trigger: 'blur' }
   ],
-  systemDeveloper: [
+  company: [
     { required: true, message: '该项目必填', trigger: 'blur' }
   ],
-  projectState: [
+  status: [
     { required: true, message: '该项目必填' }
   ]
 }
