@@ -3,14 +3,17 @@
     <case-details
       :search='true'
       :caseDataResource='caseData'
+      :tableHeadersProps='tableHeaders'
       :allDownL='true'
       :multiDownL='true'
+      :vendor='true'
       ></case-details>
   </div>
 </template>
 
 <script>
 import CaseDetails from '@/components/content/CaseDetails'
+import { VendorCaseDetailsHeader } from '@/common/TableHeaders'
 
 export default {
   name: 'CaseDetailsView',
@@ -20,6 +23,7 @@ export default {
   data () {
     return {
       caseData: [],
+      tableHeaders: VendorCaseDetailsHeader,
       // 该数据应通过后端请求得来
       caseInfo: [
         {

@@ -134,6 +134,7 @@
         </span>
       </template>
     </el-dialog>
+    <!-- <nav-menu></nav-menu> -->
   </div>
 </template>
 
@@ -142,6 +143,7 @@ import SearchContainer from '@/components/common/SearchContainer.vue'
 import TableList from '@/components/common/TableList.vue'
 import { projectListTableHeader } from '@/common/TableHeaders'
 import { projectEditFormRules } from '@/common/FormRules'
+// import NavMenu from '@/components/content/NavMenu'
 
 export default {
   data () {
@@ -292,6 +294,7 @@ export default {
   components: {
     SearchContainer,
     TableList
+    // NavMenu
   },
   created () {
     this.projectDataProps = this.projectData

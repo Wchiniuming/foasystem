@@ -8,10 +8,10 @@
       </el-table-column>
       <el-table-column v-for='item in tableHeaders' :label='item.name' :key='item.key'>
         <template #default='scope'>
-          <a v-if="[item.key]=='projectName'" @click='handleProView(scope.row)'>{{scope.row.[item.key]}}</a>
-          <a v-else-if="[item.key]=='numOfCase'" @click='handleCaseView(scope.row)'>{{scope.row.[item.key]}}</a>
-          <a v-else-if="[item.key]=='passRate'" @click='handlePassingView(scope.row)'>{{scope.row.[item.key]}}</a>
-          <a v-else-if="[item.key]=='certificated'"
+          <a v-if="[item.key]=='projectName' && nameCl==true" @click='handleProView(scope.row)'>{{scope.row.[item.key]}}</a>
+          <a v-else-if="[item.key]=='numOfCase' && caseNumCl==true" @click='handleCaseView(scope.row)'>{{scope.row.[item.key]}}</a>
+          <a v-else-if="[item.key]=='passRate' && passRCl==true" @click='handlePassingView(scope.row)'>{{scope.row.[item.key]}}</a>
+          <a v-else-if="[item.key]=='certificated' && certifyCl==true"
             @click='handleCertificatedView(scope.row)'
             :class="{'font-red': scope.row.[item.key]=='不合格'}"
             >{{scope.row.[item.key]}}</a>
@@ -84,7 +84,23 @@ export default {
     tableData: Array,
     tableHeaders: Array,
     controlType: String,
-    selectable: Boolean
+    selectable: Boolean,
+    nameCl: {
+      type: Boolean,
+      default: true
+    },
+    caseNumCl: {
+      type: Boolean,
+      default: true
+    },
+    passRCl: {
+      type: Boolean,
+      default: true
+    },
+    certifyCl: {
+      type: Boolean,
+      default: true
+    }
   },
   methods: {
     // 编辑和删除

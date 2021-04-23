@@ -35,10 +35,30 @@
       </template>
     </search-container>
     <table-list
+      :passRCl='false'
       :tableHeaders='tableHeaders'
-      :tableData='dataList'
+      :tableData='dataProps'
       :controlType='controlType'
+      @uploadCase='doUploadCase'
+      @uploadResult='doUploadResult'
+      @issueLicense='doIssueLicense'
+      @caseView='viewCaseDetails'
+      @certificatedView='viewCertification'
       ></table-list>
+    <el-dialog
+      :title="ctDialogForm.projectName"
+      v-model="certificationDialog"
+      width="50%"
+      destroy-on-close
+      center
+      >
+      <img src='@/assets/image/certification.jpg' style="width: 100%; height: 100%">
+      <template #footer>
+        <span class="dialog-footer" style="display: flex; justify-content: start">
+          <el-button type="text" @click="onCertificationDownLoad">证书下载</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -52,6 +72,9 @@ export default {
   data () {
     return {
       tableHeaders: testMainViewHeaders,
+      certificationDialog: false,
+      ctDialogForm: {},
+      dataProps: [],
       dataList: [
         {
           projectName: '测试项目1',
@@ -103,20 +126,51 @@ export default {
     resetForm (formName) {
       this.$refs[formName].resetFields()
     },
-    onQuery (formName) {},
-    uploadCase (row) {
-      this.router.push({
+    onQuery (formName) {
+      const qf = this.queryForm
+      if (qf.projectName.length === 0 && qf.productName.length === 0 && qf.status.length === 0) {
+        this.dataProps = this.dataList
+      } else {
+        this.dataProps = this.dataList.filter(project => {
+          return project.projectName.match(qf.projectName) &&
+            project.productName.match(qf.productName) &&
+            project.status.match(qf.status)
+        })
+      }
+    },
+    doUploadCase (row) {
+      this.$router.push({
         name: 'casesMaintain',
         params: { projectName: row.projectName, projectId: row.projectId }
       })
     },
-    uploadResult (row) {
-      this.router.push({
+    doUploadResult (row) {
+      this.$router.push({
         name: 'testResult',
-        params: { projectName: row.projectName, projectId: row.projectId }
+        params: { projectName: row.projectName, data: JSON.stringify(row) }
       })
     },
-    issueLicense (row) {}
+    viewCaseDetails (row) {
+      this.$router.push(
+        {
+          name: 'caseDetailsView',
+          params: { projectName: row.projectName }
+        }
+      )
+    },
+    doIssueLicense (row) {},
+    onCertificationDownLoad () {},
+    viewCertification (row) {
+      if (row.certificated === '已获得') {
+        this.ctDialogForm = row
+        this.certificationDialog = true
+      } else {
+        return false
+      }
+    }
+  },
+  created () {
+    this.dataProps = this.dataList
   }
 }
 </script>
@@ -124,6 +178,5 @@ export default {
 <style scoped>
  .customControlBt {
    margin-bottom: 20px;
-   margin-top: -12px;
  }
 </style>

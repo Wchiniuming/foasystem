@@ -4,21 +4,19 @@
       <template v-slot:queryCd>
         <el-form :inline="true" :model="caseQueryForm" ref='caseQueryForm' class="caseQuery-form">
           <el-form-item label='用例名称' prop='useCaseName'>
-            <el-input v-model="caseQueryForm.useCaseName" placeholder="用例名称" clearable></el-input>
+            <el-input v-model="caseQueryForm.useCaseName" placeholder="用例名称" clearable class="queryItem"></el-input>
           </el-form-item>
-          <el-form-item label='测试人员' prop='testMan'>
-            <el-input v-model="caseQueryForm.testMan" placeholder="测试人员" clearable></el-input>
+          <el-form-item label='模块1' prop='module1'>
+            <el-input v-model="caseQueryForm.module1" placeholder="模块1" clearable class="queryItem"></el-input>
           </el-form-item>
-          <el-form-item label='测试日期' prop='testTime'>
-             <el-date-picker
-                  v-model='caseQueryForm.testTime'
-                  type='date'
-                  placeholder='测试日期'
-                  >
-                </el-date-picker>
+          <el-form-item label='模块2' prop='module2'>
+            <el-input v-model="caseQueryForm.module2" placeholder="模块2" clearable class="queryItem"></el-input>
           </el-form-item>
-          <el-form-item label='测试结果' prop='result'>
-            <el-input v-model="caseQueryForm.result" placeholder="测试结果" clearable></el-input>
+          <el-form-item label='测试目的' prop='testTime'>
+            <el-input v-model="caseQueryForm.purpose" placeholder="测试目的" clearable class="queryItem"></el-input>
+          </el-form-item>
+          <el-form-item label='预期结果' prop='expectResult'>
+            <el-input v-model="caseQueryForm.expectResult" placeholder="预期结果" clearable class="queryItem"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" icon='el-icon-search' @click="onQuery('caseQueryForm')">查询</el-button>
@@ -96,9 +94,10 @@ export default {
     return {
       caseQueryForm: {
         useCaseName: '',
-        testMan: '',
-        testTime: '',
-        result: ''
+        module1: '',
+        module2: '',
+        purpose: '',
+        expectResult: ''
       },
       selectedCases: [],
       casesProps: []
@@ -123,23 +122,16 @@ export default {
     },
     onQuery (formName) {
       const qf = this.caseQueryForm
-      if (qf.useCaseName.length === 0 && qf.testMan.length === 0 && qf.result.length === 0 && (qf.testTime === null || qf.testTime.length === 0)) {
+      if (qf.useCaseName.length === 0 && qf.module1.length === 0 && qf.module2.length === 0 && qf.purpose.length === 0 && qf.expectResult.length === 0) {
         this.casesProps = this.caseDataResource
-      } else if ((qf.testTime !== null && qf.testTime.length !== 0)) {
+      } else {
         this.casesProps = this.caseDataResource.filter(
           casesItem => {
             return casesItem.useCaseName.match(qf.useCaseName) &&
-            casesItem.testMan.match(qf.testMan) &&
-            casesItem.testTime.match(qf.testTime) &&
-            casesItem.result.match(qf.result)
-          }
-        )
-      } else if ((qf.testTime === null || qf.testTime.length === 0)) {
-        this.casesProps = this.caseDataResource.filter(
-          casesItem => {
-            return casesItem.useCaseName.match(qf.useCaseName) &&
-            casesItem.testMan.match(qf.testMan) &&
-            casesItem.result.match(qf.result)
+            casesItem.module1.match(qf.module1) &&
+            casesItem.module2.match(qf.module2) &&
+            casesItem.purpose.match(qf.purpose) &&
+            casesItem.expectResult.match(qf.expectResult)
           }
         )
       }
@@ -153,5 +145,7 @@ export default {
 </script>
 
 <style scoped>
-
+ .queryItem {
+   width: 180px;
+ }
 </style>
