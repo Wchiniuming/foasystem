@@ -49,7 +49,7 @@ export const loginFormRule = {
   userName: [
     { required: true, message: '请填入用户名', trigger: 'blur' }
   ],
-  password: [
+  passWord: [
     { required: true, message: '请填入用户密码', trigger: 'blur' }
   ]
 }
