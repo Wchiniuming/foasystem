@@ -31,6 +31,7 @@ export const login = (data) => {
         content: '登录成功',
         duration: 0.2
       })
+      this.$router.push()
     }
     console.log('222')
   }).catch(err => {

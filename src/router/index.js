@@ -2,6 +2,8 @@ import {
   createRouter,
   createWebHistory
 } from 'vue-router'
+import storage from '@/utils/storage'
+
 const projectList = () => import('@/views/vendorview/ProjectListView')
 const newProject = () => import('@/views/vendorview/NewProject')
 const caseDetailsView = () => import('@/views/vendorview/CaseDetailsView')
@@ -28,7 +30,7 @@ const routes = [
     component: projectList,
     meta: {
       title: '厂商主页',
-      role: 'vendor'
+      roleId: 'vendor'
     }
   },
   {
@@ -37,7 +39,7 @@ const routes = [
     component: newProject,
     meta: {
       title: '新建项目',
-      role: 'vendor'
+      roleId: 'vendor'
     }
   },
   {
@@ -46,7 +48,7 @@ const routes = [
     component: caseDetailsView,
     meta: {
       title: '测试用例详情',
-      role: 'vendor'
+      roleId: 'vendor'
     }
   },
   {
@@ -55,7 +57,7 @@ const routes = [
     component: projectDetails,
     meta: {
       title: '项目详情',
-      role: 'vendor'
+      roleId: 'vendor'
     }
   },
   {
@@ -64,7 +66,7 @@ const routes = [
     component: casesMaintain,
     meta: {
       title: '测试用例管理',
-      role: 'tester'
+      roleId: 'tester'
     }
   },
   {
@@ -73,7 +75,7 @@ const routes = [
     component: resultUpload,
     meta: {
       title: '测试结果管理',
-      role: ['tester', 'vendor']
+      roleId: ['1', '2']
     }
   },
   {
@@ -82,7 +84,7 @@ const routes = [
     component: testerMainView,
     meta: {
       title: '测试人员主页',
-      role: 'tester'
+      roleId: 'tester'
     }
   },
   {
@@ -91,7 +93,7 @@ const routes = [
     component: provinceMainView,
     meta: {
       title: '省公司主页',
-      role: 'province'
+      roleId: 'province'
     }
   }
 ]
@@ -108,11 +110,11 @@ router.beforeEach((to, from, next) => {
     return
   }
   // 必须以next()结尾，否则会陷入无限路由循环问题
-  if (!localStorage.getItem('token')) {
+  if (!storage.get('token')) {
     next({
       name: 'login'
     })
-  } else if (localStorage.getItem('role') !== to.meta.role) { // 如果当前登录的角色与相应路由的角色不符，则无法进行访问
+  } else if (storage.get('role').id !== to.meta.roleId) { // 如果当前登录的角色与相应路由的角色不符，则无法进行访问
     next({
       name: '404'
     })
