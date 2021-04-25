@@ -14,6 +14,7 @@ const testerMainView = () => import('@/views/testerview/TesterMainView')
 const provinceMainView = () => import('@/views/provinceview/ProvinceView')
 const login = () => import('@/views/login/Login')
 
+// 1代表管理员，2代表厂商，3代表测试方，4代表省公司
 const routes = [
   {
     path: '/',
@@ -30,7 +31,7 @@ const routes = [
     component: projectList,
     meta: {
       title: '厂商主页',
-      roleId: 'vendor'
+      roleId: ['1', '2']
     }
   },
   {
@@ -39,7 +40,7 @@ const routes = [
     component: newProject,
     meta: {
       title: '新建项目',
-      roleId: 'vendor'
+      roleId: ['1', '2']
     }
   },
   {
@@ -48,7 +49,7 @@ const routes = [
     component: caseDetailsView,
     meta: {
       title: '测试用例详情',
-      roleId: 'vendor'
+      roleId: ['1', '2']
     }
   },
   {
@@ -57,7 +58,7 @@ const routes = [
     component: projectDetails,
     meta: {
       title: '项目详情',
-      roleId: 'vendor'
+      roleId: ['1', '2']
     }
   },
   {
@@ -66,7 +67,7 @@ const routes = [
     component: casesMaintain,
     meta: {
       title: '测试用例管理',
-      roleId: 'tester'
+      roleId: ['1', '3']
     }
   },
   {
@@ -75,7 +76,7 @@ const routes = [
     component: resultUpload,
     meta: {
       title: '测试结果管理',
-      roleId: ['1', '2']
+      roleId: ['1', '2', '3']
     }
   },
   {
@@ -84,7 +85,7 @@ const routes = [
     component: testerMainView,
     meta: {
       title: '测试人员主页',
-      roleId: 'tester'
+      roleId: ['1', '3']
     }
   },
   {
@@ -93,7 +94,7 @@ const routes = [
     component: provinceMainView,
     meta: {
       title: '省公司主页',
-      roleId: 'province'
+      roleId: ['1', '4']
     }
   }
 ]
@@ -114,7 +115,7 @@ router.beforeEach((to, from, next) => {
     next({
       name: 'login'
     })
-  } else if (storage.get('role').id !== to.meta.roleId) { // 如果当前登录的角色与相应路由的角色不符，则无法进行访问
+  } else if (storage.get('role').indexOf(to.meta.roleId) >= 0) { // 如果当前登录的角色与相应路由的角色不符，则无法进行访问
     next({
       name: '404'
     })

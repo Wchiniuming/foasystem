@@ -42,7 +42,6 @@ export default {
         if (valid) {
           const data = this.loginForm
           login(data)
-          console.log('111')
         }
       })
     },
