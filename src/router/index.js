@@ -3,6 +3,7 @@ import {
   createWebHistory
 } from 'vue-router'
 import storage from '@/utils/storage'
+// import sessionStorage from '@/utils/sessionStorage'
 
 const projectList = () => import('@/views/vendorview/ProjectListView')
 const newProject = () => import('@/views/vendorview/NewProject')
@@ -31,7 +32,7 @@ const routes = [
     component: projectList,
     meta: {
       title: '厂商主页',
-      roleId: ['1', '2']
+      roleId: [1, 2]
     }
   },
   {
@@ -40,7 +41,7 @@ const routes = [
     component: newProject,
     meta: {
       title: '新建项目',
-      roleId: ['1', '2']
+      roleId: [1, 2]
     }
   },
   {
@@ -49,7 +50,7 @@ const routes = [
     component: caseDetailsView,
     meta: {
       title: '测试用例详情',
-      roleId: ['1', '2']
+      roleId: [1, 2]
     }
   },
   {
@@ -58,7 +59,7 @@ const routes = [
     component: projectDetails,
     meta: {
       title: '项目详情',
-      roleId: ['1', '2']
+      roleId: [1, 2]
     }
   },
   {
@@ -67,7 +68,7 @@ const routes = [
     component: casesMaintain,
     meta: {
       title: '测试用例管理',
-      roleId: ['1', '3']
+      roleId: [1, 3]
     }
   },
   {
@@ -76,7 +77,7 @@ const routes = [
     component: resultUpload,
     meta: {
       title: '测试结果管理',
-      roleId: ['1', '2', '3']
+      roleId: [1, 2, 3]
     }
   },
   {
@@ -85,7 +86,7 @@ const routes = [
     component: testerMainView,
     meta: {
       title: '测试人员主页',
-      roleId: ['1', '3']
+      roleId: [1, 3]
     }
   },
   {
@@ -94,7 +95,7 @@ const routes = [
     component: provinceMainView,
     meta: {
       title: '省公司主页',
-      roleId: ['1', '4']
+      roleId: [1, 4]
     }
   }
 ]
@@ -110,14 +111,22 @@ router.beforeEach((to, from, next) => {
     next()
     return
   }
-  // 必须以next()结尾，否则会陷入无限路由循环问题
-  if (!storage.get('token')) {
+  // 必须以next()结尾，否则会陷入无限路由循环问题  后续改为使用token的方式storage.get('token')
+  // if (!sessionStorage.get('JSESSIONID')) {
+  //   next({
+  //     name: 'login'
+  //   })
+  // } else
+  // 判断用户是否具备访问目标页面的权限
+  let doAccess = 0
+  storage.get('logonUserRole').forEach(id => {
+    if (to.meta.roleId.indexOf(id) >= 0) {
+      doAccess++
+    }
+  })
+  if (doAccess === 0) {
     next({
-      name: 'login'
-    })
-  } else if (storage.get('role').indexOf(to.meta.roleId) >= 0) { // 如果当前登录的角色与相应路由的角色不符，则无法进行访问
-    next({
-      name: '404'
+      name: 404
     })
   } else {
     next()

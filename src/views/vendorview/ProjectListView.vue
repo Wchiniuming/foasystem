@@ -134,7 +134,6 @@
         </span>
       </template>
     </el-dialog>
-    <!-- <nav-menu></nav-menu> -->
   </div>
 </template>
 
@@ -143,13 +142,14 @@ import SearchContainer from '@/components/common/SearchContainer.vue'
 import TableList from '@/components/common/TableList.vue'
 import { projectListTableHeader } from '@/common/TableHeaders'
 import { projectEditFormRules } from '@/common/FormRules'
-// import NavMenu from '@/components/content/NavMenu'
+import { getProjectData } from '@/api/getData'
 
 export default {
   data () {
     return {
       controlType: 'editAndDelete',
       projectDataProps: [],
+      projectData: [],
       // 证书查看页面
       certificationDialog: false,
       ctDialogForm: {},
@@ -165,139 +165,15 @@ export default {
         beginDate: '',
         endDate: ''
       },
-      tableHeadersProps: [],
-      // 需要从接口获取的元数据信息
-      projectData: [
-        {
-          projectName: '测试项目1',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '已完成',
-          numOfCase: 100,
-          passRate: '100%',
-          certificated: '已获得',
-          company: '华为',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目2',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2021/3/19 08:25:36',
-          status: '已完成',
-          numOfCase: 100,
-          passRate: '50%',
-          certificated: '不合格',
-          company: '华为',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目3',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '申请失败',
-          numOfCase: 100,
-          passRate: '100%',
-          certificated: '已获得',
-          company: '华为',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目4',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '申请中',
-          numOfCase: 100,
-          passRate: '80%',
-          certificated: '不合格',
-          company: '思特奇',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目5',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '测试中',
-          numOfCase: 100,
-          passRate: '100%',
-          certificated: '已获得',
-          company: '亚信',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目6',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '已完成',
-          numOfCase: 100,
-          passRate: '100%',
-          certificated: '已获得',
-          company: '亚信',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目7',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '申请中',
-          numOfCase: 100,
-          passRate: '100%',
-          certificated: '已获得',
-          company: '亚信',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目8',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '测试中',
-          numOfCase: 100,
-          passRate: '100%',
-          certificated: '已获得',
-          company: '亚信',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        }
-      ]
+      tableHeadersProps: []
     }
   },
   components: {
     SearchContainer,
     TableList
-    // NavMenu
   },
   created () {
-    this.projectDataProps = this.projectData
+    this.getData({ pageNum: 1, pageSize: 20, projectInfo: {} })
     this.tableHeadersProps = projectListTableHeader
     this.editRules = projectEditFormRules
   },
@@ -343,6 +219,24 @@ export default {
       } else {
         this.projectDataProps = this.projectData
       }
+    },
+    getData (queryCd) {
+      getProjectData(queryCd).then(res => {
+        console.log(res.data)
+        if (res.data.code === 401) {
+          alert('未认证，请先登录！')
+          this.$router.push('/login')
+          return
+        }
+        if (res.data.code === 200) {
+          this.projectData = res.data.data.list
+          this.projectDataProps = this.projectData
+        } else {
+          console.log(res.data.msg)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     },
     resetForm (formName) {
       this.$refs[formName].resetFields()
