@@ -36,7 +36,7 @@ const routes = [
         component: projectList,
         meta: {
           title: '项目信息管理',
-          roleId: [1, 3]
+          roleId: [1]
         }
       },
       {

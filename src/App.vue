@@ -10,4 +10,13 @@ export default {
 
 <style>
 @import url('./assets/css/normalize.css');
+  html {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  body {
+    width: 100vw;
+    overflow: hidden;
+    padding-right: calc(100vw - 100%);
+  }
 </style>
