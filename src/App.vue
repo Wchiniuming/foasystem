@@ -1,28 +1,13 @@
 <template>
-  <el-container>
-    <el-main>
-      <router-view></router-view>
-    </el-main>
-  <nav-menu v-if="logon"></nav-menu>
-  </el-container>
+  <router-view></router-view>
 </template>
 
 <script>
-import NavMenu from '@/components/content/NavMenu'
-
 export default {
-  name: 'App',
-  components: {
-    NavMenu
-  },
-  data () {
-    return {
-      logon: false
-    }
-  }
+  name: 'App'
 }
 </script>
 
 <style>
-@import url('/@/assets/css/normalize.css');
+@import url('./assets/css/normalize.css');
 </style>

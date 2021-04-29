@@ -35,14 +35,23 @@ export const projectCreateFormRules = {
   productVer: [
     { required: true, message: '该项目必填', trigger: 'blur' }
   ],
-  finishedTime: [
-    { type: 'date', required: true, message: '该项目必填', trigger: 'blur' }
-  ],
   company: [
-    { required: true, message: '该项目必填', trigger: 'blur' }
+    { required: true, message: '该项目必填' }
   ],
   status: [
     { required: true, message: '该项目必填' }
+  ],
+  contactMan: [
+    { required: true, message: '该项目必填', trigger: 'blur' }
+  ],
+  contactPhone: [
+    { required: true, message: '该项目必填', trigger: 'blur' }
+  ],
+  contactEmail: [
+    { required: true, message: '该项目必填', trigger: 'blur' }
+  ],
+  projectLevel: [
+    { required: true, message: '该项目必填', trigger: 'blur' }
   ]
 }
 export const loginFormRule = {

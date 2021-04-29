@@ -18,11 +18,11 @@ module.exports = {
     https: false,
     proxy: {
       '/api': {
-        target: 'http://192.168.43.164:8080',//这里后台的地址
+        target: 'http://172.20.10.4:8080', // 后台服务器地址（仅限开发使用），正式上线后需要使用NGINX
         ws: true,
-        changOrigin: true,//允许跨域
+        changOrigin: true, // 允许跨域
         pathRewrite: {
-            '^/api': ''//请求的时候使用这个api就可以
+          '^/api': ''// 请求的时候使用这个api就可以。http://XXXX/api会全部被替换为target的内容。
         }
       }
     }

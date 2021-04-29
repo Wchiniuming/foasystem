@@ -34,7 +34,7 @@
         </el-form>
       </template>
     </search-container>
-    <table-list
+    <project-table-list
       :nameCl='false'
       :passRCl='false'
       :tableHeaders='tableHeadersProps'
@@ -42,7 +42,7 @@
       @caseView='viewCaseDetails'
       @certificatedView='viewCertification'
       >
-    </table-list>
+    </project-table-list>
     <el-dialog
       :title="ctDialogForm.projectName"
       v-model="certificationDialog"
@@ -61,15 +61,17 @@
 </template>
 
 <script>
-import SearchContainer from '@/components/common/SearchContainer.vue'
-import TableList from '@/components/common/TableList.vue'
+import SearchContainer from '@/components/common/SearchContainer'
+import ProjectTableList from '@/components/common/ProjectTableList'
 import { provinceProjectListTableHeader } from '@/common/TableHeaders'
+import { getProjectData } from '@/api/getData'
 
 export default {
   name: 'ProvinceView',
   data () {
     return {
       projectDataProps: [],
+      projectDataBackup: [],
       // 证书查看页面
       ctDialogForm: {},
       certificationDialog: false,
@@ -81,152 +83,46 @@ export default {
         productName: '',
         status: '',
         productVer: ''
-      },
-      // 需要从接口获取的元数据信息
-      projectData: [
-        {
-          projectName: '测试项目1',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '已完成',
-          numOfCase: 100,
-          passRate: '100%',
-          certificated: '已获得',
-          company: '华为',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目2',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2021/3/19 08:25:36',
-          status: '已完成',
-          numOfCase: 100,
-          passRate: '50%',
-          certificated: '不合格',
-          company: '华为',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目3',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '申请失败',
-          numOfCase: 100,
-          passRate: '100%',
-          certificated: '已获得',
-          company: '华为',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目4',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '申请中',
-          numOfCase: 100,
-          passRate: '80%',
-          certificated: '不合格',
-          company: '思特奇',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目5',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '测试中',
-          numOfCase: 100,
-          passRate: '100%',
-          certificated: '已获得',
-          company: '亚信',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目6',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '已完成',
-          numOfCase: 100,
-          passRate: '100%',
-          certificated: '已获得',
-          company: '亚信',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目7',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '申请中',
-          numOfCase: 100,
-          passRate: '100%',
-          certificated: '已获得',
-          company: '亚信',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        },
-        {
-          projectName: '测试项目8',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '测试中',
-          numOfCase: 100,
-          passRate: '100%',
-          certificated: '已获得',
-          company: '亚信',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩'
-        }
-      ]
+      }
     }
   },
   components: {
     SearchContainer,
-    TableList
-  },
-  created () {
-    this.projectDataProps = this.projectData
+    ProjectTableList
   },
   methods: {
+    getData () {
+      const data = { pageNum: 1, pageSize: 20, projectInfo: {} }
+      getProjectData(data).then(res => {
+        if (res.data.code === 2001 || res.data.code === 2009) {
+          alert('账号超时，请重新登录！')
+          this.$router.replace('/login')
+        }
+        if (res.data.code === 200) {
+          this.projectDataProps = res.data.data.list
+          this.projectDataBackup = this.projectDataProps
+          console.log('数据请求成功', res.data.msg)
+          console.log(res)
+        } else {
+          console.log('数据请求失败', res)
+        }
+      }).catch(err => {
+        alert('网络请求异常，请稍后再试！')
+        console.log('网络请求异常', err)
+      })
+    },
     onQuery (formName) {
       const pqf = this.projQueryForm
       const notNull = pqf.projectName.length === 0 && pqf.productName.length === 0 && pqf.status.length === 0 && pqf.productVer.length === 0
       if (notNull) {
-        this.projectDataProps = this.projectData
+        this.projectDataProps = this.projectDataBackup
       } else {
-        this.projectDataProps = this.projectData
+        this.projectDataProps = this.projectDataBackup
           .filter(project => {
-            return project.projectName.match(pqf.projectName) &&
-            project.productName.match(pqf.productName) &&
-            project.status.match(pqf.status) &&
-            project.productVer.match(pqf.productVer)
+            return project.metadata.projectName.match(pqf.projectName) &&
+            project.metadata.productName.match(pqf.productName) &&
+            project.metadata.status.match(pqf.status) &&
+            project.metadata.productVer.match(pqf.productVer)
           })
       }
     },
@@ -237,7 +133,7 @@ export default {
       this.$router.push(
         {
           name: 'caseDetailsView',
-          params: { projectName: row.projectName }
+          params: { projectId: row.projectId }
         }
       )
     },
@@ -252,6 +148,9 @@ export default {
     onCertificationDownLoad () {
       // 下载功能实现①通过超链接直接访问后端下载;
     }
+  },
+  created () {
+    this.getData()
   }
 }
 </script>

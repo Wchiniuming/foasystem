@@ -12,14 +12,14 @@
           <el-form-item label='模块2' prop='module2'>
             <el-input v-model="caseQueryForm.module2" placeholder="模块2" clearable class="queryItem"></el-input>
           </el-form-item>
-          <el-form-item label='测试目的' prop='testTime'>
+          <el-form-item label='测试目的' prop='purpose'>
             <el-input v-model="caseQueryForm.purpose" placeholder="测试目的" clearable class="queryItem"></el-input>
           </el-form-item>
           <el-form-item label='预期结果' prop='expectResult'>
             <el-input v-model="caseQueryForm.expectResult" placeholder="预期结果" clearable class="queryItem"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" icon='el-icon-search' @click="onQuery('caseQueryForm')">查询</el-button>
+            <el-button type="primary" icon='el-icon-search' @click="onQuery">查询</el-button>
             <el-button type="info" small icon='el-icon-refresh' @click="resetForm('caseQueryForm')">重置</el-button>
           </el-form-item>
         </el-form>
@@ -38,7 +38,7 @@
     </div>
     <table-list
       :tableHeaders='tableHeadersProps'
-      :tableData='casesProps'
+      :tableData='caseDataResource'
       :selectable='selectable'
       :controlType='controlType'
       @multiSelect='selectCases'
@@ -99,8 +99,7 @@ export default {
         purpose: '',
         expectResult: ''
       },
-      selectedCases: [],
-      casesProps: []
+      selectedCases: []
     }
   },
   methods: {
@@ -120,26 +119,9 @@ export default {
     resetForm (formName) {
       this.$refs[formName].resetFields()
     },
-    onQuery (formName) {
-      const qf = this.caseQueryForm
-      if (qf.useCaseName.length === 0 && qf.module1.length === 0 && qf.module2.length === 0 && qf.purpose.length === 0 && qf.expectResult.length === 0) {
-        this.casesProps = this.caseDataResource
-      } else {
-        this.casesProps = this.caseDataResource.filter(
-          casesItem => {
-            return casesItem.useCaseName.match(qf.useCaseName) &&
-            casesItem.module1.match(qf.module1) &&
-            casesItem.module2.match(qf.module2) &&
-            casesItem.purpose.match(qf.purpose) &&
-            casesItem.expectResult.match(qf.expectResult)
-          }
-        )
-      }
+    onQuery () {
+      this.$emit('caseQuery', this.caseQueryForm)
     }
-  },
-  created () {
-    // 备份全量数据，用于查询
-    this.casesProps = this.caseDataResource
   }
 }
 </script>

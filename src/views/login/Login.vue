@@ -1,31 +1,28 @@
 <template>
-  <div class="login-form">
-    <el-form ref="loginForm"
-      :model="loginForm"
-      :rules='rules'
-      label-width="120px"
-      style="background-color: rgba(179, 192, 192, 0.35); border-radius: 38px; padding-right: 50px; width:30%; box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);">
-    <h2 class="header" style="text-align: center">FOA系统</h2>
-    <h4 class="header" style="text-align: center">用户登录</h4>
-      <el-form-item label="用户名" prop='userName'>
-        <el-input v-model="loginForm.userName"></el-input>
-      </el-form-item>
-      <el-form-item label="密  码" prop='passWord'>
-        <el-input type="passWord" v-model="loginForm.passWord" autocomplete="off"></el-input>
-      </el-form-item>
-      <!-- <el-form-item label="角 色" prop='role'>
-        <el-radio-group v-model="loginForm.role">
-          <el-radio :label="4">省公司</el-radio>
-          <el-radio :label="3">测试人员</el-radio>
-          <el-radio :label="2">厂商</el-radio>
-        </el-radio-group>
-      </el-form-item> -->
-      <el-form-item class="control-bt">
-        <el-button type="primary" size='medium' @click="onLogin('loginForm')" style="margin-right: 50px;">登 录</el-button>
-        <el-button type='info' size='medium' large plain @click="onReset('loginForm')">重 置</el-button>
-      </el-form-item>
-    </el-form>
-  </div>
+  <el-container>
+    <el-main>
+      <div class="login-form">
+        <el-form ref="loginForm"
+          :model="loginForm"
+          :rules='rules'
+          label-width="80px"
+          @keyup.enter="onLogin('loginForm')"
+          style="background-color: rgba(179, 192, 192, 0.35); border-radius: 38px; padding-right: 80px; width:24%; box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);">
+        <h2 class="header" style="text-align: center">FOA系统</h2>
+        <h4 class="header" style="text-align: center">用户登录</h4>
+          <el-form-item prop='userName'>
+            <el-input prefix-icon="el-icon-user-solid" v-model="loginForm.userName"></el-input>
+          </el-form-item>
+          <el-form-item prop='passWord'>
+            <el-input prefix-icon="el-icon-lock" type="passWord" v-model="loginForm.passWord" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item class="control-bt">
+            <el-button type="primary" size='medium' @click="onLogin('loginForm')" style="font-size: 18px;width: 85%">登 录</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-main>
+  </el-container>
 </template>
 
 <script>
@@ -61,33 +58,34 @@ export default {
               // 根据角色判定跳转不同路径
               if (logonUserRole.indexOf(1) >= 0) {
                 this.$router.push({
-                  name: 'projectList'
+                  name: 'adminMainView',
+                  params: { userName: this.loginForm.userName }
                 }) // 管理员
-              } else if (logonUserRole.indexOf(2) >= 0) {
-                this.$router.push({
-                  name: 'projectList'
-                }) // 厂商
               } else if (logonUserRole.indexOf(3) >= 0) {
                 this.$router.push({
-                  name: 'casesMaintain'
+                  name: 'vendorMainView',
+                  params: { userName: this.loginForm.userName }
+                }) // 厂商
+              } else if (logonUserRole.indexOf(5) >= 0) {
+                this.$router.push({
+                  name: 'testerMainView',
+                  params: { userName: this.loginForm.userName }
                 }) // 测试人员
               } else if (logonUserRole.indexOf(4) >= 0) {
                 this.$router.push({
-                  name: 'provinceMainView'
+                  name: 'provinceMainView',
+                  params: { userName: this.loginForm.userName }
                 }) // 省公司
               }
-              console.log(res.data.msg)
             } else {
-              console.log(res.data.msg)
+              console.log('登录失败', res.data.msg)
             }
           }).catch(err => {
-            console.log(err)
+            alert('网络请求异常,请检查网络或稍后再试！')
+            console.log('网络请求异常', err)
           })
         }
       })
-    },
-    onReset (formName) {
-      this.$refs[formName].resetFields()
     }
   }
 }
@@ -105,14 +103,7 @@ export default {
     margin-left: 50px;
   }
   .control-bt {
-    margin-top: 50px;
+    margin: 40px 0;
     text-align: center;
-    margin-left: -50px;
   }
-  /* html {
-    background-image: url('../../assets/image/login.jpeg')
-  } */
-  /* label.el-form-item__label, .el-radio__label {
-    color: white;
-  } */
 </style>

@@ -8,16 +8,16 @@
     </div>
     <search-container>
       <template v-slot:queryCd>
-        <el-form :inline="true" :model="queryForm" ref='queryForm' style="width:100%">
+        <el-form :inline="true" :model="queryForm" ref='queryForm' style="width:100%;padding-left:10px;">
           <el-col :span='20' style="width: 100%">
             <el-form-item label='项目名称' prop="projectName">
-              <el-input v-model="queryForm.projectName" placeholder="项目名称" class='itemInput' clearable></el-input>
+              <el-input v-model="queryForm.projectName" placeholder="项目名称" clearable></el-input>
             </el-form-item>
-            <el-form-item label='版本' prop="productName">
-              <el-input v-model="queryForm.productName" placeholder="产品" class='itemInput' clearable></el-input>
+            <el-form-item label='版本' prop="productVer">
+              <el-input v-model="queryForm.productVer" placeholder="版本" clearable></el-input>
             </el-form-item>
             <el-form-item label='状态' prop="status">
-              <el-select v-model="queryForm.status" class='itemInput' placeholder="状态" clearable>
+              <el-select v-model="queryForm.status" placeholder="状态" clearable>
                 <el-option label="已完成" value="已完成"></el-option>
                 <el-option label="申请中" value="申请中"></el-option>
                 <el-option label="申请失败" value="申请失败"></el-option>
@@ -34,7 +34,7 @@
         </el-form>
       </template>
     </search-container>
-    <table-list
+    <project-table-list
       :passRCl='false'
       :tableHeaders='tableHeaders'
       :tableData='dataProps'
@@ -44,7 +44,7 @@
       @issueLicense='doIssueLicense'
       @caseView='viewCaseDetails'
       @certificatedView='viewCertification'
-      ></table-list>
+      ></project-table-list>
     <el-dialog
       :title="ctDialogForm.projectName"
       v-model="certificationDialog"
@@ -64,8 +64,9 @@
 
 <script>
 import SearchContainer from '@/components/common/SearchContainer'
-import TableList from '@/components/common/TableList'
+import ProjectTableList from '@/components/common/ProjectTableList'
 import { testMainViewHeaders } from '@/common/TableHeaders'
+import { getProjectData } from '@/api/getData'
 
 export default {
   name: 'TestMainView',
@@ -75,44 +76,11 @@ export default {
       certificationDialog: false,
       ctDialogForm: {},
       dataProps: [],
-      dataList: [
-        {
-          projectName: '测试项目1',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2020/11/19 08:25:36',
-          status: '已完成',
-          numOfCase: 100,
-          passRate: '100%',
-          certificated: '已获得',
-          company: '华为',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩',
-          principal: ['宋宝玉', '宋宝玉']
-        },
-        {
-          projectName: '测试项目2',
-          productName: 'BOSS',
-          productVer: 'V1.2',
-          createTime: '2021/3/19 08:25:36',
-          status: '已完成',
-          numOfCase: 100,
-          passRate: '50%',
-          certificated: '不合格',
-          company: '华为',
-          description: '紧急',
-          projectLevel: '紧急',
-          finishedTime: '2020/11/19 08:25:36',
-          contactMan: '奥恩',
-          principal: ['宋宝玉', '游艺']
-        }
-      ],
+      dataList: [],
       controlType: 'upload',
       queryForm: {
         projectName: '',
-        productName: '',
+        productVer: '',
         status: ''
       },
       numOfTodo: 0
@@ -120,41 +88,42 @@ export default {
   },
   components: {
     SearchContainer,
-    TableList
+    ProjectTableList
   },
   methods: {
     resetForm (formName) {
       this.$refs[formName].resetFields()
     },
     onQuery (formName) {
+      // 查询内容要排除空字段，否则会出现match的错误
       const qf = this.queryForm
-      if (qf.projectName.length === 0 && qf.productName.length === 0 && qf.status.length === 0) {
+      if (qf.projectName.length === 0 && qf.productVer.length === 0 && qf.status.length === 0) {
         this.dataProps = this.dataList
       } else {
         this.dataProps = this.dataList.filter(project => {
-          return project.projectName.match(qf.projectName) &&
-            project.productName.match(qf.productName) &&
-            project.status.match(qf.status)
+          return project.metadata.projectName !== null && project.metadata.projectName.match(qf.projectName) &&
+            project.metadata.productVer !== null && project.metadata.productVer.match(qf.productVer) &&
+            project.metadata.status !== null && project.metadata.status.match(qf.status)
         })
       }
     },
     doUploadCase (row) {
       this.$router.push({
         name: 'casesMaintain',
-        params: { projectName: row.projectName, projectId: row.projectId }
+        params: { projectId: row.projectId }
       })
     },
     doUploadResult (row) {
       this.$router.push({
         name: 'testResult',
-        params: { projectName: row.projectName, data: JSON.stringify(row) }
+        params: { projectId: row.projectId, data: JSON.stringify(row) }
       })
     },
     viewCaseDetails (row) {
       this.$router.push(
         {
           name: 'caseDetailsView',
-          params: { projectName: row.projectName }
+          params: { projectId: row.projectId }
         }
       )
     },
@@ -167,10 +136,28 @@ export default {
       } else {
         return false
       }
+    },
+    getData (queryCd) {
+      getProjectData(queryCd).then(res => {
+        if (res.data.code === 2001 || res.data.code === 2009) {
+          alert('账号超时，请重新登录！')
+          this.$router.replace('/login')
+        }
+        if (res.data.code === 200) {
+          console.log(res.data)
+          this.dataList = res.data.data.list
+          this.dataProps = this.dataList
+        } else {
+          console.log('数据获取失败', res.data.msg)
+        }
+      }).catch(err => {
+        alert('网络请求异常，请稍后再试！')
+        console.log('网络请求异常', err)
+      })
     }
   },
   created () {
-    this.dataProps = this.dataList
+    this.getData({ pageNum: 1, pageSize: 50, projectInfo: {} })
   }
 }
 </script>

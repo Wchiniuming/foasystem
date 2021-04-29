@@ -28,7 +28,7 @@
             <label class="projectItem">{{projectInfo.projectLevel}}</label>
           </el-form-item>
         </el-col>
-        <el-col :span='4' style="margin-left: 150px;">
+        <el-col :span='4' style="margin-left: 150px;" v-if="isTester">
           <el-button type='primary'>测试结果上传</el-button>
         </el-col>
       </el-form>
@@ -45,56 +45,53 @@
 
 <script>
 import CaseDetails from '@/components/content/CaseDetails'
+import { getCasesByPid } from '@/api/getData'
+import storage from '@/utils/storage'
 
 export default {
   name: 'ResultUpload',
   data () {
     return {
       projectInfo: {},
-      caseData: [],
       // 该数据应通过后端请求得来
-      caseInfo: [
-        {
-          useCaseId: 1,
-          useCaseName: 'GSM全球通语音',
-          module1: '语音',
-          module2: '市话',
-          module3: '套内',
-          module4: '整分钟',
-          purpose: '10',
-          beforeTest: '50',
-          result: '通过',
-          steps: 'lalal',
-          expectResult: '111',
-          testMan: '11111',
-          testTime: '111'
-        },
-        {
-          useCaseId: 2,
-          useCaseName: 'GSM全球通语音2',
-          module1: '语音2',
-          module2: '市话2',
-          module3: '套2内',
-          module4: '整2分钟',
-          productId: '50001001：6063211',
-          testPhoneNumber: '18868872260',
-          purpose: '102',
-          beforeTest: '520',
-          result: '不通过',
-          steps: '不知道',
-          expectResult: '111',
-          testMan: '222',
-          testTime: '2222'
-        }
-      ]
+      caseInfo: []
     }
   },
   components: {
     CaseDetails
   },
+  computed: {
+    isTester () {
+      return storage.get('logonUserRole').indexOf(5) >= 0
+    }
+  },
+  methods: {
+    getData () {
+      const data = {
+        projectId: this.$route.params.projectId,
+        pageNum: 1,
+        pageSize: 20
+      }
+      getCasesByPid(data).then(res => {
+        if (res.data.code === 2001 || res.data.code === 2009) {
+          alert('账号超时，请重新登录！')
+          this.$router.replace('/login')
+        }
+        if (res.data.code === 200) {
+          this.caseInfo = res.data.data.list
+          console.log('数据获取成功', res.data.msg)
+        } else {
+          console.log('数据获取失败', res)
+        }
+      }).catch(err => {
+        alert('网络请求异常，请稍后再试！')
+        console.log('网络请求异常', err)
+      })
+    }
+  },
   created () {
     this.projectInfo = JSON.parse(this.$route.params.data)
-    this.caseData = this.caseInfo
+    this.getData()
   }
 }
 </script>

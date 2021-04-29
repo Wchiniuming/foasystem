@@ -9,6 +9,7 @@
       :multiDel='true'
       :caseUpl='true'
       :modelDl='true'
+      @caseQuery='doCaseQuery'
     ></case-details>
   </div>
 </template>
@@ -16,6 +17,7 @@
 <script>
 import CaseDetails from '@/components/content/CaseDetails'
 import { casesMaintainHeaders } from '@/common/TableHeaders'
+import { getCasesByPid } from '@/api/getData'
 
 export default {
   name: 'CasesMaintain',
@@ -27,40 +29,51 @@ export default {
       controlType: 'editAndDelete',
       tableHeaders: casesMaintainHeaders,
       caseInfo: [],
-      caseData: [
-        {
-          useCaseId: 1,
-          useCaseName: 'GSM全球通语音',
-          module1: '语音',
-          module2: '市话',
-          module3: '套内',
-          module4: '整分钟',
-          purpose: '10',
-          beforeTest: '50',
-          result: '通过',
-          steps: 'lalal',
-          expectResult: '111'
-        },
-        {
-          useCaseId: 2,
-          useCaseName: 'GSM全球通语音2',
-          module1: '语音2',
-          module2: '市话2',
-          module3: '套2内',
-          module4: '整2分钟',
-          productId: '50001001：6063211',
-          testPhoneNumber: '18868872260',
-          purpose: '102',
-          beforeTest: '520',
-          result: '不通过',
-          steps: '不知道',
-          expectResult: '111'
+      caseData: []
+    }
+  },
+  methods: {
+    getData () {
+      const data = {
+        projectId: this.$route.params.projectId,
+        pageNum: 1,
+        pageSize: 20
+      }
+      getCasesByPid(data).then(res => {
+        if (res.data.code === 2001 || res.data.code === 2009) {
+          alert('账号超时，请重新登录！')
+          this.$router.replace('/login')
         }
-      ]
+        if (res.data.code === 200) {
+          this.caseInfo = res.data.data.list
+          this.caseData = this.caseInfo
+          console.log('数据获取成功', res.data.msg)
+        } else {
+          console.log('数据获取失败', res)
+        }
+      }).catch(err => {
+        alert('网络请求异常，请稍后再试！')
+        console.log('网络请求异常', err)
+      })
+    },
+    doCaseQuery (queryForm) {
+      if (queryForm.useCaseName.length === 0 && queryForm.module1.length === 0 && queryForm.module2.length === 0 && queryForm.purpose.length === 0 && queryForm.expectResult.length === 0) {
+        this.caseInfo = this.caseData
+      } else {
+        this.caseInfo = this.caseData.filter(
+          casesItem => {
+            return casesItem.useCaseName.match(queryForm.useCaseName) &&
+            casesItem.module1.match(queryForm.module1) &&
+            casesItem.module2.match(queryForm.module2) &&
+            casesItem.purpose.match(queryForm.purpose) &&
+            casesItem.expectResult.match(queryForm.expectResult)
+          }
+        )
+      }
     }
   },
   created () {
-    this.caseInfo = this.caseData
+    this.getData()
   }
 }
 </script>

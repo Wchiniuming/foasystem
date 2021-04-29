@@ -23,9 +23,6 @@
         <el-form-item label="厂商:">
           <label class="projectItem">{{projectInfo.company}}</label>
         </el-form-item>
-        <el-form-item label="待上线省份:">
-          <label class="projectItem">{{projectInfo.province}}</label>
-        </el-form-item>
         <el-form-item label="测试产品:">
           <label class="projectItem">{{projectInfo.productName}}</label>
         </el-form-item>
@@ -51,30 +48,14 @@
 </template>
 
 <script>
+import { getProjectAnnexes } from '@/api/getData'
+
 export default {
   name: 'ProjectDetails',
   data () {
     return {
       projectInfo: {},
-      projectDt: {
-        projectName: '测试项目1',
-        company: '厂商1',
-        province: '省公司1',
-        productName: '产品1',
-        contactMan: '接口人',
-        projectLevel: '紧急'
-      },
-      // 附件的数据，通过projectId发送请求，到后端获取
-      annexes: [
-        {
-          projectId: '1',
-          fileName: '1.山东BOSS升级说明.docx'
-        },
-        {
-          projectId: '2',
-          fileName: '2.山东BOSS升级说明2.docx'
-        }
-      ]
+      annexes: []
     }
   },
   methods: {
@@ -83,13 +64,29 @@ export default {
     },
     doDownload (name) {
       // 文件下载
+    },
+    getData () {
+      // 获取项目详情，并初始化
+      this.projectInfo = JSON.parse(this.$route.params.data)
+      // 根据projectId获取项目的附件信息
+      getProjectAnnexes(this.projectInfo.projectId).then(res => {
+        if (res.data.code === 2001 || res.data.code === 2009) {
+          alert('账号超时，请重新登录！')
+          this.$router.replace('/login')
+        }
+        if (res.data.code === 200) {
+          this.annexes = res.data.data
+        } else {
+          console.log(res.data.msg)
+        }
+      }).catch(err => {
+        alert('网络请求异常，请稍后再试！')
+        console.log('网络请求异常', err)
+      })
     }
   },
-  created () {
-    // 从路由中获取projectId，请求获取相应的附件列表，并赋值给annexes
-  },
   beforeMount () {
-    this.projectInfo = this.projectDt
+    this.getData()
   }
 }
 </script>

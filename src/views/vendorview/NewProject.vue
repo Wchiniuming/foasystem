@@ -19,24 +19,37 @@
           </el-col>
         </el-form-item>
         <el-form-item label="产品开发商" prop="company">
-          <el-input v-model="createForm.company" placeholder='产品开发商'></el-input>
-        </el-form-item>
-        <el-form-item label="预计完成时间" prop="finishedTime">
-          <el-date-picker type="date" placeholder="预计完成时间" v-model="createForm.finishedTime" style="width: 42%;"></el-date-picker>
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
           <el-col :span='8'>
-            <el-select v-model="createForm.status" placeholder="项目状态">
-              <el-option label="测试中" value="测试中"></el-option>
-              <el-option label="已申请" value="已申请"></el-option>
-              <el-option label="已完成" value="已完成"></el-option>
+            <el-select v-model="createForm.company" placeholder="厂商">
+              <el-option label="华为" value="华为"></el-option>
+              <el-option label="亚信" value="亚信"></el-option>
+              <el-option label="中兴" value="中兴"></el-option>
+              <el-option label="新大陆" value="新大陆"></el-option>
+              <el-option label="爱立信" value="爱立信"></el-option>
             </el-select>
           </el-col>
           <el-col :span='16'>
-          <el-form-item label="紧急度" prop="projectLevel">
-            <el-input v-model="createForm.projectLevel" placeholder='紧急度' ></el-input>
-          </el-form-item>
-        </el-col>
+            <el-form-item label="紧急度" prop="projectLevel">
+              <el-select v-model="createForm.projectLevel" placeholder="紧急度">
+                <el-option label="低" value="低"></el-option>
+                <el-option label="中" value="中"></el-option>
+                <el-option label="高" value="高"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="联系人" prop="contactMan">
+          <el-input v-model="createForm.contactMan" placeholder='联系人' style="width: 42%"></el-input>
+        </el-form-item>
+        <el-form-item label="联系电话" prop="contactPhone">
+          <el-col :span='8'>
+            <el-input v-model="createForm.contactPhone" placeholder='电话'></el-input>
+          </el-col>
+          <el-col :span='16'>
+            <el-form-item label="电子邮件" prop="contactEmail">
+              <el-input v-model="createForm.contactEmail" placeholder='邮件'></el-input>
+            </el-form-item>
+          </el-col>
         </el-form-item>
         <el-form-item label="项目描述" prop="description" style="width: 100%">
           <el-input type="textarea" placeholder='项目描述' :autosize='{minRows: 5, maxRows: 10}' v-model="createForm.description" style="width: 100%"></el-input>
@@ -68,6 +81,7 @@
 
 <script>
 import { projectCreateFormRules } from '@/common/FormRules'
+import { createProject } from '@/api/createData'
 
 export default {
   name: 'NewProject',
@@ -77,29 +91,51 @@ export default {
         projectName: '',
         productName: '',
         productVer: '',
-        status: '',
-        finishedTime: '',
         projectLevel: '',
         description: '',
-        company: ''
+        company: '',
+        contactMan: '',
+        contactPhone: '',
+        contactEmail: ''
       },
       rules: {},
-      fileList: [
-        {
-          name: 'ccc.dox',
-          url: ''
-        }
-      ]
+      fileList: []
     }
   },
   methods: {
     doCreate (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!');
-        } else {
-          console.log('error submit!!');
-          return false;
+          createProject(this.createForm).then(res => {
+            if (res.data.code === 2001 || res.data.code === 2009) {
+              alert('账号超时，请重新登录！')
+              this.$router.replace('/login')
+            }
+            if (res.data.code === 200) {
+              alert('项目新建成功')
+              this.$router.push({
+                name: 'projectList'
+              })
+              // console.log(this.fileList)
+              // if (this.fileList.length !== 0) {
+              //   // 上传功能尚存问题。。。。。。。。。
+              //   uploadFiles({ projectId: res.data.data, files: this.fileList }).then(subRes => {
+              //     console.log(subRes)
+              //     console.log('上传成功')
+              //   }).catch(subRes => {
+              //     console.log(subRes)
+              //     console.log('上传失败')
+              //   })
+              // } else {
+              //   console.log('无附件')
+              // }
+            } else {
+              console.log('保存失败')
+            }
+          }).catch(err => {
+            alert('网络请求异常，请稍后再试！')
+            console.log('网络请求异常', err)
+          })
         }
       });
     },

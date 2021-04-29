@@ -3,7 +3,6 @@ import {
   createWebHistory
 } from 'vue-router'
 import storage from '@/utils/storage'
-// import sessionStorage from '@/utils/sessionStorage'
 
 const projectList = () => import('@/views/vendorview/ProjectListView')
 const newProject = () => import('@/views/vendorview/NewProject')
@@ -14,8 +13,9 @@ const resultUpload = () => import('@/views/testerview/ResultUpload')
 const testerMainView = () => import('@/views/testerview/TesterMainView')
 const provinceMainView = () => import('@/views/provinceview/ProvinceView')
 const login = () => import('@/views/login/Login')
+const Main = () => import('@/views/main/Main')
 
-// 1代表管理员，2代表厂商，3代表测试方，4代表省公司
+// 0未分配，1代表管理员，2普通，3代表厂商，4代表省公司，5代表测试方
 const routes = [
   {
     path: '/',
@@ -27,76 +27,91 @@ const routes = [
     component: login
   },
   {
-    path: '/projectlist',
-    name: 'projectList',
-    component: projectList,
-    meta: {
-      title: '厂商主页',
-      roleId: [1, 2]
-    }
-  },
-  {
-    path: '/newproject',
-    name: 'newProject',
-    component: newProject,
-    meta: {
-      title: '新建项目',
-      roleId: [1, 2]
-    }
-  },
-  {
-    path: '/casedetails/:projectName',
-    name: 'caseDetailsView',
-    component: caseDetailsView,
-    meta: {
-      title: '测试用例详情',
-      roleId: [1, 2]
-    }
-  },
-  {
-    path: '/projectdetails/:projectId',
-    name: 'projectDetails',
-    component: projectDetails,
-    meta: {
-      title: '项目详情',
-      roleId: [1, 2]
-    }
-  },
-  {
-    path: '/casesmaintain/:projectName',
-    name: 'casesMaintain',
-    component: casesMaintain,
-    meta: {
-      title: '测试用例管理',
-      roleId: [1, 3]
-    }
-  },
-  {
-    path: '/testresult/:projectName',
-    name: 'testResult',
-    component: resultUpload,
-    meta: {
-      title: '测试结果管理',
-      roleId: [1, 2, 3]
-    }
-  },
-  {
-    path: '/testermain',
-    name: 'testerMainView',
-    component: testerMainView,
-    meta: {
-      title: '测试人员主页',
-      roleId: [1, 3]
-    }
-  },
-  {
-    path: '/provincemain',
-    name: 'provinceMainView',
-    component: provinceMainView,
-    meta: {
-      title: '省公司主页',
-      roleId: [1, 4]
-    }
+    path: '/main',
+    component: Main,
+    children: [
+      {
+        path: 'admin',
+        name: 'adminMainView',
+        component: projectList,
+        meta: {
+          title: '项目信息管理',
+          roleId: [1, 3]
+        }
+      },
+      {
+        path: 'vendor',
+        name: 'vendorMainView',
+        component: projectList,
+        meta: {
+          title: '项目信息管理',
+          roleId: [1, 3]
+        }
+      },
+      {
+        path: 'tester',
+        name: 'testerMainView',
+        component: testerMainView,
+        meta: {
+          title: '测试信息管理',
+          roleId: [1, 5]
+        }
+      },
+      {
+        path: 'province',
+        name: 'provinceMainView',
+        component: provinceMainView,
+        meta: {
+          title: '省公司主页',
+          roleId: [1, 4]
+        }
+      },
+      {
+        path: 'createproject',
+        name: 'createProject',
+        component: newProject,
+        meta: {
+          title: '新建项目',
+          roleId: [1, 3]
+        }
+      },
+      {
+        path: 'projectdetails/:projectId',
+        name: 'projectDetails',
+        component: projectDetails,
+        meta: {
+          title: '项目详情',
+          roleId: [1, 3]
+        }
+      },
+      {
+        path: 'casesmaintain/:projectId',
+        name: 'casesMaintain',
+        component: casesMaintain,
+        meta: {
+          title: '测试用例管理',
+          roleId: [1, 5]
+        }
+      },
+      {
+        path: 'casedetails/:projectId',
+        name: 'caseDetailsView',
+        component: caseDetailsView,
+        meta: {
+          title: '测试用例详情',
+          roleId: [1, 3]
+        }
+      },
+      {
+        path: 'testresult/:projectId',
+        name: 'testResult',
+        component: resultUpload,
+        meta: {
+          title: '测试结果管理',
+          roleId: [1, 3, 5]
+        }
+      }
+    ]
   }
 ]
 
@@ -119,16 +134,24 @@ router.beforeEach((to, from, next) => {
   // } else
   // 判断用户是否具备访问目标页面的权限
   let doAccess = 0
-  storage.get('logonUserRole').forEach(id => {
-    if (to.meta.roleId.indexOf(id) >= 0) {
-      doAccess++
-    }
-  })
+  console.log(storage.get('logonUserRole'))
+  if (storage.get('logonUserRole')) {
+    storage.get('logonUserRole').forEach(id => {
+      if (to.meta.roleId.indexOf(id) >= 0) {
+        doAccess++
+      }
+    })
+  } else {
+    next('/login')
+    return
+  }
   if (doAccess === 0) {
+    alert('不可越权访问！')
     next({
       name: 404
     })
   } else {
+    document.title = to.meta.title
     next()
   }
 })

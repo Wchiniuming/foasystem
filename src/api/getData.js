@@ -17,3 +17,27 @@ export const getProjectData = (data) => {
     }
   })
 }
+
+export const getCasesByPid = (data) => {
+  return axios({
+    method: 'post',
+    url: '/api/useCase/list',
+    params: {
+      pageNum: data.pageNum,
+      pageSize: data.pageSize
+    },
+    data: {
+      projectId: data.projectId
+    },
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+}
+
+export const getProjectAnnexes = (projectId) => {
+  return axios({
+    method: 'get',
+    url: '/api/files/list/' + projectId
+  })
+}
