@@ -2,7 +2,7 @@ import {
   createRouter,
   createWebHistory
 } from 'vue-router'
-import storage from '@/utils/storage'
+// import storage from '@/utils/storage'
 
 const projectList = () => import('@/views/vendorview/ProjectListView')
 const newProject = () => import('@/views/vendorview/NewProject')
@@ -29,6 +29,7 @@ const routes = [
   {
     path: '/main',
     component: Main,
+    roleId: [],
     children: [
       {
         path: 'admin',
@@ -81,7 +82,7 @@ const routes = [
         component: projectDetails,
         meta: {
           title: '项目详情',
-          roleId: [1, 3]
+          roleId: [1, 3, 5]
         }
       },
       {
@@ -99,7 +100,7 @@ const routes = [
         component: caseDetailsView,
         meta: {
           title: '测试用例详情',
-          roleId: [1, 3]
+          roleId: [1, 3, 4]
         }
       },
       {
@@ -134,9 +135,9 @@ router.beforeEach((to, from, next) => {
   // } else
   // 判断用户是否具备访问目标页面的权限
   let doAccess = 0
-  console.log(storage.get('logonUserRole'))
-  if (storage.get('logonUserRole')) {
-    storage.get('logonUserRole').forEach(id => {
+  const role = JSON.parse(sessionStorage.getItem('logonUserRole'))
+  if (role) {
+    role.forEach(id => {
       if (to.meta.roleId.indexOf(id) >= 0) {
         doAccess++
       }

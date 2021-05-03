@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import storage from '@/utils/storage'
+// import storage from '@/utils/storage'
 import NavMenu from '@/components/content/NavMenu'
 
 export default {
@@ -20,10 +20,10 @@ export default {
   },
   computed: {
     isAdmin () {
-      return storage.get('logonUserRole').indexOf(1) >= 0
+      return JSON.parse(sessionStorage.getItem('logonUserRole')).indexOf(1) >= 0
     },
     userName () {
-      return this.$route.params.userName
+      return this.$store.getters['user/getUserName']
     }
   }
 }

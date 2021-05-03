@@ -5,8 +5,13 @@ export const updataPorject = (projectInfo) => {
     method: 'post',
     url: '/api/projects/update',
     data: projectInfo
-    // headers: {
-    //   'Content-Type': 'application/json'
-    // }
+  })
+}
+
+export const updateCase = (useCaseInfo) => {
+  return axios({
+    method: 'post',
+    url: '/api/useCase/update',
+    data: useCaseInfo
   })
 }

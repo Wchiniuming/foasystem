@@ -12,7 +12,7 @@ export const createProject = (data) => {
 export const uploadFiles = (data) => {
   return axios({
     method: 'post',
-    url: '/files/upload/' + data.projectId,
+    url: '/api/files/upload/' + data.projectId,
     data: data.files
   })
 }

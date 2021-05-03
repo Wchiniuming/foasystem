@@ -33,14 +33,17 @@
           <label class="projectItem">{{projectInfo.projectLevel}}</label>
         </el-form-item>
         <el-form-item label="附件:">
-          <div v-for="file in annexes" :key="file.fileName">
-            <ul style="list-style: none;">
-              <li>
-                <span style="margin-right: 10px">{{file.fileName}}</span>
-                <el-button type='text' @click="doDownload(file.fileName)">下载</el-button>
-              </li>
-            </ul>
+          <div v-if="annexes.length>0">
+            <div v-for="file in annexes" :key="file.fileName">
+              <ul style="list-style: none;">
+                <li>
+                  <span style="margin-right: 10px">{{file.fileName}}</span>
+                  <el-button type='text' @click="doDownload(file.fileName)">下载</el-button>
+                </li>
+              </ul>
+            </div>
           </div>
+          <span v-else style="color: red">项目无附件</span>
         </el-form-item>
       </el-form>
     </div>
@@ -67,12 +70,20 @@ export default {
     },
     getData () {
       // 获取项目详情，并初始化
-      this.projectInfo = JSON.parse(this.$route.params.data)
+      if (this.$route.params.data) {
+        this.projectInfo = JSON.parse(this.$route.params.data)
+      } else if (sessionStorage.getItem('projectInfo')) { // 应对页面刷新的情况，从缓存中读取数据
+        this.projectInfo = JSON.parse(sessionStorage.getItem('projectInfo'))
+      }
       // 根据projectId获取项目的附件信息
       getProjectAnnexes(this.projectInfo.projectId).then(res => {
         if (res.data.code === 2001 || res.data.code === 2009) {
-          alert('账号超时，请重新登录！')
-          this.$router.replace('/login')
+          this.$alert('账号超时，请重新登录！', '超时', {
+            confirmButtonText: 'OK',
+            callback: () => {
+              this.$router.replace('/login')
+            }
+          })
         }
         if (res.data.code === 200) {
           this.annexes = res.data.data
@@ -80,13 +91,17 @@ export default {
           console.log(res.data.msg)
         }
       }).catch(err => {
-        alert('网络请求异常，请稍后再试！')
-        console.log('网络请求异常', err)
+        this.$message({ message: '附件信息网络请求异常！', type: 'error' })
+        console.log('附件信息网络请求异常！', err)
       })
     }
   },
   beforeMount () {
     this.getData()
+    // 添加刷新前的监听函数，缓存项目数据
+    window.addEventListener('beforeunload', () => {
+      sessionStorage.setItem('projectInfo', JSON.stringify(this.projectInfo))
+    })
   }
 }
 </script>

@@ -72,7 +72,10 @@
       v-model="projectEditDialog"
       width="50%"
       destroy-on-close
-      center>
+      :show-close='false'
+      center
+      :before-close="handleBeforeClose"
+      >
       <el-form :model="projectEditingForm" :rules="pEditFormRules" ref="projectEditingForm" label-width="120px">
         <el-form-item label="项目名称" prop="projectName">
           <el-input v-model="projectEditingForm.projectName" style="width: 42%" placeholder='项目名称'></el-input>
@@ -121,27 +124,29 @@
           </el-col>
         </el-form-item>
         <el-form-item label="项目描述" prop="description" style="width: 91%">
-          <el-input type="textarea" placeholder='项目描述' :autosize='{minRows: 5, maxRows: 10}' v-model="projectEditingForm.description" style="width: 100%"></el-input>
+          <el-input v-model="projectEditingForm.description"  type="textarea" placeholder='项目描述' :autosize='{minRows: 5, maxRows: 10}' style="width: 100%"></el-input>
         </el-form-item>
-        <!-- <el-form-item label="附件">
+        <el-form-item label="附件">
           <el-upload
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action=""
             :on-remove="handleRemove"
             :before-remove="beforeRemove"
             multiple
             :limit="5"
             :on-exceed="handleExceed"
-            :file-list="fileList"
+            :file-list="projectEditingForm.fileList"
+            :auto-upload='false'
+            :on-change="handleUpload"
           >
             <el-button size="small" type="primary">附件上传</el-button>
             <template #tip>
               <div class="el-upload__tip">不得超过5个</div>
             </template>
           </el-upload>
-        </el-form-item> -->
+        </el-form-item>
         <el-form-item>
           <span class="dialog-footer">
-            <el-button @click="projectEditDialog = false">取 消</el-button>
+            <el-button @click="onCancelSave('projectEditingForm')">取 消</el-button>
             <el-button type="primary" @click="onEditSave('projectEditingForm')">保 存</el-button>
           </span>
         </el-form-item>
@@ -169,9 +174,11 @@ import SearchContainer from '@/components/common/SearchContainer.vue'
 import ProjectTableList from '@/components/common/ProjectTableList.vue'
 import { projectListTableHeader } from '@/common/TableHeaders'
 import { projectCreateFormRules } from '@/common/FormRules'
-import { getProjectData } from '@/api/getData'
+import { getProjectData, getProjectAnnexes } from '@/api/getData'
 import { deleteProjectById } from '@/api/deleteData'
 import { updataPorject } from '@/api/editData'
+import { upload } from '@/utils/upload'
+import xlsx from 'xlsx'
 
 export default {
   name: 'ProjectListView',
@@ -180,12 +187,15 @@ export default {
       controlType: 'editAndDelete',
       projectDataProps: [],
       projectData: [],
+      fileList: [],
       // 证书查看页面
       certificationDialog: false,
       ctDialogForm: {},
       // 编辑窗口的属性信息
       projectEditDialog: false,
       projectEditingForm: {},
+      projectEditingFormBack: {},
+      fileListData: [], // 用于存储附件上传的参数信息
       pEditFormRules: projectCreateFormRules,
       // 查询窗口的属性信息
       projQueryForm: {
@@ -253,66 +263,128 @@ export default {
       const data = { pageNum: 1, pageSize: 20, projectInfo: {} }
       getProjectData(data).then(res => {
         if (res.data.code === 2001 || res.data.code === 2009) {
-          alert('账号超时，请重新登录！')
-          this.$router.replace('/login')
+          this.$alert('账号超时，请重新登录！', '超时', {
+            confirmButtonText: 'OK',
+            callback: () => {
+              this.$router.replace('/login')
+            }
+          })
         }
         if (res.data.code === 200) {
           this.projectData = res.data.data.list
           this.projectDataProps = this.projectData
         } else {
-          console.log(res.data.msg)
+          this.$message({ message: '数据获取失败！', type: 'error' })
+          console.log('数据获取失败！', res.data.msg)
         }
       }).catch(err => {
-        alert('网络请求异常，请稍后再试！')
+        this.$message({ message: '网络请求发送失败', type: 'error' })
         console.log('网络请求异常', err)
       })
+    },
+    /* eslint dot-notation: 0 */
+    // 取消按钮事件中绑定resetfields()功能，从而使保存操作的时候，表单数据不会被重置为备份值
+    handleBeforeClose (done) {
+      this.$refs['projectEditingForm'].resetFields()
+      done()
     },
     resetForm (formName) {
       this.$refs[formName].resetFields()
     },
+    // 项目新建
     newProject () {
       this.$router.push({
         name: 'createProject'
       })
     },
+    // 项目编辑
     editProject (row) {
       this.projectEditingForm = row
+      // 获取附件信息，并加载
+      getProjectAnnexes(row.projectId).then(res => {
+        if (res.data.code === 2001 || res.data.code === 2009) {
+          this.$alert('账号超时，请重新登录！', '超时', {
+            confirmButtonText: 'OK',
+            callback: () => {
+              this.$router.replace('/login')
+            }
+          })
+        }
+        if (res.data.code === 200) {
+          this.projectEditingForm.fileList = res.data.data.map(item => {
+            return { name: item.fileName, status: 'success', projectId: item.projectId }
+          })
+        } else {
+          console.log(res.data.msg)
+        }
+      }).catch(err => {
+        this.$message({ message: '附件信息网络请求异常！', type: 'error' })
+        console.log('附件信息网络请求异常！', err)
+      })
       this.projectEditDialog = true
     },
+    // 取消编辑
+    onCancelSave (formName) {
+      this.$refs[formName].resetFields()
+      this.projectEditDialog = false
+    },
+    // 项目编辑保存
     onEditSave (formName) {
-      // 发送post请求，提交数据变更
-      // ...
+      // 发送post请求，提交项目数据变更
+      // 发送post请求，更新附件信息---待补充代码（如何快速的判断前后数据没有变化？）
       // 关闭dialog
       this.$refs[formName].validate(valid => {
         if (valid) {
           updataPorject(this.projectEditingForm).then(res => {
+            if (res.data.code === 2001 || res.data.code === 2009) {
+              this.$alert('账号超时，请重新登录！', '超时', {
+                confirmButtonText: 'OK',
+                callback: () => {
+                  this.$router.replace('/login')
+                }
+              })
+            }
             if (res.data.code === 200) {
-              console.log('项目信息修改成功', res.data.msg)
+              this.$message({ message: '项目信息修改成功', type: 'success' })
               this.projectEditDialog = false
             } else {
+              this.$message({ message: '项目信息修改失败', type: 'error' })
               console.log('项目信息修改失败', res)
             }
           }).catch(err => {
+            this.$message({ message: '网络请求发送失败', type: 'error' })
             console.log('请求发送失败', err)
           })
         }
       })
     },
+    // 删除项目
     deleteProject (index, row) {
       this.$confirm('确定移除该条数据吗？').then(() => {
-        this.projectData.splice(index, 1)
-        this.projectDataProps = this.projectData
         deleteProjectById(row.projectId).then(res => {
+          if (res.data.code === 2001 || res.data.code === 2009) {
+            this.$alert('账号超时，请重新登录！', '超时', {
+              confirmButtonText: 'OK',
+              callback: () => {
+                this.$router.replace('/login')
+              }
+            })
+          }
           if (res.data.code === 200) {
-            console.log('项目删除成功', res.data.msg)
+            this.projectData.splice(index, 1)
+            this.projectDataProps = this.projectData
+            this.$message({ message: '项目删除成功', type: 'success' })
           } else {
+            this.$message({ message: '项目删除失败', type: 'error' })
             console.log('项目删除失败', res)
           }
         }).catch(err => {
+          this.$message({ message: '删除请求失败', type: 'error' })
           console.log('请求失败', err)
         })
-      })
+      }).catch((cancel) => {})
     },
+    // 查看项目详情
     viewProjectDetails (row) {
       this.$router.push(
         {
@@ -321,6 +393,7 @@ export default {
         }
       )
     },
+    // 查看用例详情
     viewCaseDetails (row) {
       this.$router.push(
         {
@@ -329,6 +402,7 @@ export default {
         }
       )
     },
+    // 点击通过率，查看测试结果
     viewTestResult (row) {
       this.$router.push(
         {
@@ -340,6 +414,7 @@ export default {
         }
       )
     },
+    // 点击认证情况
     viewCertification (row) {
       if (row.certificated === '已获得') {
         this.ctDialogForm = row
@@ -348,8 +423,37 @@ export default {
         return false
       }
     },
+    // 认证文件下载
     onCertificationDownLoad () {
       // 下载功能实现①通过超链接直接访问后端下载;
+    },
+    // 项目编辑窗口中的附件上传功能
+    async handleUpload (ev) {
+      // 获取时间的目标对象，并解析
+      const file = ev.raw
+      const name = file.name
+      if (!file) return
+      let reader = await upload(file)
+      // 读取识别目标对象，将其编译出来
+      const worker = xlsx.read(reader, { type: 'binary' })
+      // 将返回的数据转换为json对象的数据
+      reader = xlsx.utils.sheet_to_json(worker.Sheets[worker.SheetNames[0]])
+      this.fileList.push({ name: name, data: reader, status: 'success' })
+      this.fileListData.push(reader)
+      // 将解析的数据进行字段对应，并通过接口传递至后端(根据接口的要求，确定是解析后上传还是直接上传reader的形式)
+    },
+    // 附件移除
+    handleRemove (file, fileList) {
+      this.projectEditingForm.fileList = fileList
+      this.fileListData.splice(this.fileListData.indexOf(file), 1)
+    },
+    // 附件超限提醒
+    handleExceed (files, fileList) {
+      this.$message.warning(`当前限制选择 5 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+    },
+    // 附件移除前确认（可以直接在handleRemove中实现）
+    beforeRemove (file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
     }
   }
 }

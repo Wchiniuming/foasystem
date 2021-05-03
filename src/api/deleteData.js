@@ -7,3 +7,11 @@ export const deleteProjectById = (projectId) => {
     url: '/api/projects/del/' + projectId
   })
 }
+
+export const deleteCaseById = (casesId) => {
+  return axios({
+    method: 'delete',
+    url: '/api/useCase/del',
+    data: casesId
+  })
+}

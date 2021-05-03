@@ -1,12 +1,12 @@
 <template>
   <div>
-    <el-table stripe ref="multipleTable" :data='tableData' @selection-change="handleSelectionChange" style='width: 100%'>
+    <el-table stripe ref="multipleTable" :default-sort="sortRules" :data='tableData' @selection-change="handleSelectionChange" style='width: 100%'>
       <el-table-column
         type="selection"
         width="55"
         v-if='selectable'>
       </el-table-column>
-      <el-table-column v-for='item in tableHeaders' :width="comWidth(item.name)" :label='item.name' :key='item.key'>
+      <el-table-column v-for='item in tableHeaders' :prop="item.key" :sortable="sortable(item.key)" :width="comWidth(item.name)" :label='item.name' :key='item.key'>
         <template #default='scope'>
           <a v-if="[item.key]=='projectName' && nameCl==true" @click='handleProView(scope.row.metadata)'>{{scope.row.metadata.[item.key]}}</a>
           <a v-else-if="[item.key]=='numOfCase' && caseNumCl==true" @click='handleCaseView(scope.row.metadata)'>{{scope.row.statistic.[item.key]}}</a>
@@ -82,6 +82,16 @@
 <script>
 export default {
   name: 'ProjectTableList',
+  data () {
+    return {
+      sortRules: [
+        { prop: 'passRate', order: 'descending' },
+        { prop: 'createTime' },
+        { prop: 'finishedTime' },
+        { prop: 'numOfCase' }
+      ]
+    }
+  },
   props: {
     tableData: Array,
     tableHeaders: Array,
@@ -105,6 +115,9 @@ export default {
     }
   },
   methods: {
+    sortable (key) {
+      return key === 'createTime' || key === 'finishedTime' || key === 'numOfCase' || key === 'passRate'
+    },
     comWidth (name) {
       if (name.match('时间')) {
         return 180

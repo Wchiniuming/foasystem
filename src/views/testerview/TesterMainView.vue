@@ -36,6 +36,7 @@
     </search-container>
     <project-table-list
       :passRCl='false'
+      :caseNumCl='false'
       :tableHeaders='tableHeaders'
       :tableData='dataProps'
       :controlType='controlType'
@@ -44,6 +45,7 @@
       @issueLicense='doIssueLicense'
       @caseView='viewCaseDetails'
       @certificatedView='viewCertification'
+      @projectView='viewProjectDetails'
       ></project-table-list>
     <el-dialog
       :title="ctDialogForm.projectName"
@@ -127,6 +129,14 @@ export default {
         }
       )
     },
+    viewProjectDetails (row) {
+      this.$router.push(
+        {
+          name: 'projectDetails',
+          params: { projectId: row.projectId, data: JSON.stringify(row) }
+        }
+      )
+    },
     doIssueLicense (row) {},
     onCertificationDownLoad () {},
     viewCertification (row) {
@@ -137,27 +147,32 @@ export default {
         return false
       }
     },
-    getData (queryCd) {
-      getProjectData(queryCd).then(res => {
+    getData () {
+      const data = { pageNum: 1, pageSize: 50, projectInfo: {} }
+      getProjectData(data).then(res => {
         if (res.data.code === 2001 || res.data.code === 2009) {
-          alert('账号超时，请重新登录！')
-          this.$router.replace('/login')
+          this.$alert('账号超时，请重新登录！', '超时', {
+            confirmButtonText: 'OK',
+            callback: () => {
+              this.$router.replace('/login')
+            }
+          })
         }
         if (res.data.code === 200) {
-          console.log(res.data)
           this.dataList = res.data.data.list
           this.dataProps = this.dataList
         } else {
+          this.$message({ message: '数据获取失败', type: 'error' })
           console.log('数据获取失败', res.data.msg)
         }
       }).catch(err => {
-        alert('网络请求异常，请稍后再试！')
+        this.$message({ message: '网络请求异常，请稍后再试！', type: 'error' })
         console.log('网络请求异常', err)
       })
     }
   },
   created () {
-    this.getData({ pageNum: 1, pageSize: 50, projectInfo: {} })
+    this.getData()
   }
 }
 </script>

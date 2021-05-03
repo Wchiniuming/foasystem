@@ -56,11 +56,13 @@
         </el-form-item>
         <el-form-item label="附件">
           <el-upload
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action=""
             :on-remove="handleRemove"
             :before-remove="beforeRemove"
-            multiple
+            :on-change="handleUpload"
+            :auto-upload="false"
             :limit="5"
+            accept=".xlsx, .xls"
             :on-exceed="handleExceed"
             :file-list="fileList"
           >
@@ -81,7 +83,9 @@
 
 <script>
 import { projectCreateFormRules } from '@/common/FormRules'
-import { createProject } from '@/api/createData'
+import { createProject, uploadFiles } from '@/api/createData'
+import { upload } from '@/utils/upload'
+import xlsx from 'xlsx'
 
 export default {
   name: 'NewProject',
@@ -99,7 +103,8 @@ export default {
         contactEmail: ''
       },
       rules: {},
-      fileList: []
+      fileList: [],
+      fileListData: []
     }
   },
   methods: {
@@ -108,36 +113,47 @@ export default {
         if (valid) {
           createProject(this.createForm).then(res => {
             if (res.data.code === 2001 || res.data.code === 2009) {
-              alert('账号超时，请重新登录！')
-              this.$router.replace('/login')
+              this.$alert('账号超时，请重新登录！', '超时', {
+                confirmButtonText: 'OK',
+                callback: () => {
+                  this.$router.replace('/login')
+                }
+              })
             }
             if (res.data.code === 200) {
-              alert('项目新建成功')
-              this.$router.push({
-                name: 'projectList'
+              uploadFiles({ projectId: res.data.data, files: this.fileListData }).then(subRes => {
+                this.$message({ message: '项目新建成功', type: 'success' })
+                setTimeout(() => { this.$router.back() }, 3000)
+              }).catch(subRes => {
+                this.$message({ message: '项目新建成功，但附件上传失败，请检查附件！', type: 'error' })
+                setTimeout(() => { this.$router.back() }, 3000)
+                console.log('上传失败')
+                console.log(subRes)
               })
-              // console.log(this.fileList)
-              // if (this.fileList.length !== 0) {
-              //   // 上传功能尚存问题。。。。。。。。。
-              //   uploadFiles({ projectId: res.data.data, files: this.fileList }).then(subRes => {
-              //     console.log(subRes)
-              //     console.log('上传成功')
-              //   }).catch(subRes => {
-              //     console.log(subRes)
-              //     console.log('上传失败')
-              //   })
-              // } else {
-              //   console.log('无附件')
-              // }
             } else {
-              console.log('保存失败')
+              this.$message({ message: '项目新建失败！', type: 'error' })
+              console.log('保存失败', res.data)
             }
           }).catch(err => {
-            alert('网络请求异常，请稍后再试！')
+            this.$message({ message: '网络请求异常，请稍后再试！', type: 'error' })
             console.log('网络请求异常', err)
           })
         }
       });
+    },
+    async handleUpload (ev) {
+      // 获取时间的目标对象，并解析
+      const file = ev.raw
+      const name = file.name
+      if (!file) return
+      let reader = await upload(file)
+      // 读取识别目标对象，将其编译出来
+      const worker = xlsx.read(reader, { type: 'binary' })
+      // 将返回的数据转换为json对象的数据
+      reader = xlsx.utils.sheet_to_json(worker.Sheets[worker.SheetNames[0]])
+      this.fileList.push({ name: name, data: reader, status: 'success' })
+      this.fileListData.push(reader)
+      // 将解析的数据进行字段对应，并通过接口传递至后端(根据接口的要求，确定是解析后上传还是直接上传reader的形式)
     },
     doCancel (formName) {
       this.$refs[formName].resetFields();
@@ -145,7 +161,8 @@ export default {
     },
     // 上传附件相关
     handleRemove (file, fileList) {
-      console.log(file, fileList);
+      this.fileList = fileList
+      this.fileListData.splice(this.fileListData.indexOf(file), 1)
     },
     handleExceed (files, fileList) {
       this.$message.warning(`当前限制选择 5 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);

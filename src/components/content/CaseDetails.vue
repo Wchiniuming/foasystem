@@ -42,6 +42,8 @@
       :selectable='selectable'
       :controlType='controlType'
       @multiSelect='selectCases'
+      @edit='caseEdit'
+      @delete='caseDelete'
     ></table-list>
   </div>
 </template>
@@ -104,18 +106,26 @@ export default {
   },
   methods: {
     selectCases (selectedValue) {
-      this.selectCases = selectedValue
+      this.selectedCases = selectedValue
     },
     multiDownLoad () {
-      this.$emit('multiDownLoad', this.selectCases)
+      this.$emit('multiDownLoad', this.selectedCases)
     },
     allDownLoad () {
       // 下载全量用例
       this.$emit('allDownLoad', this.caseDataResource)
     },
-    multiDelete () {},
+    multiDelete () {
+      this.$emit('multiCaseDelete', this.selectedCases)
+    },
     caseUpload () {},
     modelDownload () {},
+    caseEdit (row) {
+      this.$emit('doCaseEdit', row)
+    },
+    caseDelete (index, row) {
+      this.$emit('doCaseDelete', index, row)
+    },
     resetForm (formName) {
       this.$refs[formName].resetFields()
     },

@@ -28,7 +28,7 @@
             <label class="projectItem">{{projectInfo.projectLevel}}</label>
           </el-form-item>
         </el-col>
-        <el-col :span='4' style="margin-left: 150px;" v-if="isTester">
+        <el-col :span='4' style="margin-left: 150px;" v-if="hasAuthority">
           <el-button type='primary'>测试结果上传</el-button>
         </el-col>
       </el-form>
@@ -38,6 +38,8 @@
         :caseDataResource='caseInfo'
         :multiDownL='true'
         :multiDel='true'
+        @multiDownLoad='multiDownLoad'
+        @multiCaseDelete='multiCaseDelete'
         ></case-details>
     </div>
   </div>
@@ -46,7 +48,8 @@
 <script>
 import CaseDetails from '@/components/content/CaseDetails'
 import { getCasesByPid } from '@/api/getData'
-import storage from '@/utils/storage'
+import { casesDownLoad } from '@/utils/download'
+import { casesDelete } from '@/utils/delete'
 
 export default {
   name: 'ResultUpload',
@@ -61,8 +64,8 @@ export default {
     CaseDetails
   },
   computed: {
-    isTester () {
-      return storage.get('logonUserRole').indexOf(5) >= 0
+    hasAuthority () {
+      return JSON.parse(sessionStorage.getItem('logonUserRole')).indexOf(5) >= 0 || JSON.parse(sessionStorage.getItem('logonUserRole')).indexOf(1) >= 0
     }
   },
   methods: {
@@ -74,23 +77,31 @@ export default {
       }
       getCasesByPid(data).then(res => {
         if (res.data.code === 2001 || res.data.code === 2009) {
-          alert('账号超时，请重新登录！')
-          this.$router.replace('/login')
+          this.$alert('账号超时，请重新登录！', '超时', {
+            confirmButtonText: 'OK',
+            callback: () => {
+              this.$router.replace('/login')
+            }
+          })
         }
         if (res.data.code === 200) {
           this.caseInfo = res.data.data.list
-          console.log('数据获取成功', res.data.msg)
         } else {
           console.log('数据获取失败', res)
         }
       }).catch(err => {
-        alert('网络请求异常，请稍后再试！')
+        this.$message({ message: '网络请求异常，请稍后再试！', type: 'error' })
         console.log('网络请求异常', err)
       })
+    },
+    multiDownLoad (selectedCases) {
+      casesDownLoad(selectedCases, this)
+    },
+    multiCaseDelete (selectedCases) {
+      casesDelete(selectedCases, this.caseInfo, this.caseInfo, this)
     }
   },
   created () {
-    this.projectInfo = JSON.parse(this.$route.params.data)
     this.getData()
   }
 }

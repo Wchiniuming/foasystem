@@ -9,10 +9,6 @@ export const login = (data) => {
       username: data.userName,
       password: data.passWord
     }
-    // headers: {
-    //   Authorization: this.$store.user.getToken,
-    //   'Content-Type': 'application/x-www-form-urlencoded'
-    // }
   })
 }
 

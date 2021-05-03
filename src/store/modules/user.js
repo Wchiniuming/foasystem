@@ -37,6 +37,9 @@ const getters = {
       state.token = storage.get('token')
     }
     return state.token
+  },
+  getUserName (state) {
+    return state.user.userName
   }
 }
 

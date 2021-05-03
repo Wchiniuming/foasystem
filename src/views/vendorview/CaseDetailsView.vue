@@ -56,13 +56,23 @@ export default {
         pageSize: 20
       }
       getCasesByPid(data).then(res => {
+        if (res.data.code === 2001 || res.data.code === 2009) {
+          this.$alert('账号超时，请重新登录！', '超时', {
+            confirmButtonText: 'OK',
+            callback: () => {
+              this.$router.replace('/login')
+            }
+          })
+        }
         if (res.data.code === 200) {
           this.caseData = res.data.data.list
           this.caseDataBackup = res.data.data.list
-          console.log('数据获取成功', this.caseData)
+        } else {
+          this.$message({ message: '数据获取失败', type: 'error' })
+          console.log('网络请求异常', res.data)
         }
       }).catch(err => {
-        alert('网络请求异常，请稍后再试！')
+        this.$message({ message: '网络请求异常，请稍后再试！', type: 'error' })
         console.log('网络请求异常', err)
       })
     }

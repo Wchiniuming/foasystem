@@ -34,7 +34,6 @@
 </template>
 
 <script>
-import storage from '@/utils/storage'
 import { logout } from '@/api/login'
 
 export default {
@@ -43,6 +42,16 @@ export default {
     return {
       index: '1'
     }
+  },
+  created () {
+    // 在导航加载时读取sessionStorage里的导航位置信息
+    if (sessionStorage.getItem('navIndex')) {
+      this.index = JSON.parse(sessionStorage.getItem('navIndex'))
+    }
+    // 在导航刷新时将当前的导航位置信息保存到sessionStorage里
+    window.addEventListener('beforeunload', () => {
+      sessionStorage.setItem('navIndex', JSON.stringify(this.index))
+    })
   },
   props: {
     userName: {
@@ -54,28 +63,36 @@ export default {
   methods: {
     handleSelect (key, keyPath) {
       if (key === '1') {
+        this.index = key
         this.$router.push({ name: 'adminMainView' })
       }
       if (key === '2') {
+        this.index = key
         this.$router.push({ name: 'testerMainView' })
       }
       if (key === '3') {
+        this.index = key
         this.$router.push({ name: 'adminMainView' }) // 通用配置视图，待开发
       }
     },
     onLogout () {
-      // 清除登录状态
-      logout().then(res => {
-        if (res.data.code === 200) {
-          console.log('退出登录成功', res)
-          storage.remove('logonUserRole')
-          this.$router.replace('/login')
-        } else {
-          console.log('退出失败', res)
-        }
-      }).catch(err => {
-        console.log('退出请求失败', err)
-      })
+      this.$confirm('所有未保存的操作将会失效，请确认是否退出？').then(() => {
+        logout().then(res => {
+          if (res.data.code === 200) {
+            // 清除登录状态
+            sessionStorage.removeItem('logonUserRole')
+            sessionStorage.removeItem('navIndex')
+            this.$router.replace('/login')
+            this.$message({ message: '退出登录成功', type: 'success' })
+          } else {
+            this.$message({ message: '退出失败', type: 'error' })
+            console.log('退出失败', res)
+          }
+        }).catch(err => {
+          this.$message({ message: '退出请求失败', type: 'error' })
+          console.log('退出请求失败', err)
+        })
+      }).catch((cancel) => {})
     }
   }
 }

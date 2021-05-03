@@ -14,11 +14,11 @@ module.exports = {
   devServer: {
     open: true,
     host: 'localhost',
-    port: 8080,
+    port: 5000,
     https: false,
     proxy: {
       '/api': {
-        target: 'http://172.20.10.4:8080', // 后台服务器地址（仅限开发使用），正式上线后需要使用NGINX
+        target: 'http://192.168.124.8:8080', // http://172.20.10.4:8080后台服务器地址（仅限开发使用），正式上线后需要使用NGINX
         ws: true,
         changOrigin: true, // 允许跨域
         pathRewrite: {
