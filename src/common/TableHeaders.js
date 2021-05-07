@@ -89,7 +89,7 @@ export const CaseDetailsHeader = [
   },
   {
     key: 'module2',
-    name: '模块二'
+    name: '模块一'
   },
   {
     key: 'module3',

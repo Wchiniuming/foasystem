@@ -8,3 +8,11 @@ export const useCasesExport = (useCasesId) => {
     responseType: 'blob'
   })
 }
+
+export const allCasesExport = (projectId) => {
+  return axios({
+    method: 'post',
+    url: '/api/useCase/export/' + projectId,
+    responseType: 'blob'
+  })
+}

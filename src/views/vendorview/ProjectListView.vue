@@ -177,8 +177,8 @@ import { projectCreateFormRules } from '@/common/FormRules'
 import { getProjectData, getProjectAnnexes } from '@/api/getData'
 import { deleteProjectById } from '@/api/deleteData'
 import { updataPorject } from '@/api/editData'
-import { upload } from '@/utils/upload'
-import xlsx from 'xlsx'
+import { uploadFiles } from '@/api/createData'
+import axios from 'axios'
 
 export default {
   name: 'ProjectListView',
@@ -195,8 +195,8 @@ export default {
       projectEditDialog: false,
       projectEditingForm: {},
       projectEditingFormBack: {},
-      fileListData: [], // 用于存储附件上传的参数信息
       pEditFormRules: projectCreateFormRules,
+      files: [],
       // 查询窗口的属性信息
       projQueryForm: {
         projectName: '',
@@ -260,7 +260,7 @@ export default {
       }
     },
     getData () {
-      const data = { pageNum: 1, pageSize: 20, projectInfo: {} }
+      const data = { pageNum: 1, pageSize: 50, projectInfo: {} }
       getProjectData(data).then(res => {
         if (res.data.code === 2001 || res.data.code === 2009) {
           this.$alert('账号超时，请重新登录！', '超时', {
@@ -331,12 +331,15 @@ export default {
     // 项目编辑保存
     onEditSave (formName) {
       // 发送post请求，提交项目数据变更
-      // 发送post请求，更新附件信息---待补充代码（如何快速的判断前后数据没有变化？）
+      // 发送post请求，更新附件信息---待补充代码（如何快速的判断前后数据没有变化:文件名+大小的md5？）
       // 关闭dialog
       this.$refs[formName].validate(valid => {
         if (valid) {
-          updataPorject(this.projectEditingForm).then(res => {
-            if (res.data.code === 2001 || res.data.code === 2009) {
+          axios.all([
+            updataPorject(this.projectEditingForm),
+            uploadFiles(this.projectEditingForm.projectId, this.files)
+          ]).then(axios.spread((infoUpdata, fileUpload) => {
+            if (infoUpdata.data.code === 2001 || infoUpdata.data.code === 2009) {
               this.$alert('账号超时，请重新登录！', '超时', {
                 confirmButtonText: 'OK',
                 callback: () => {
@@ -344,14 +347,13 @@ export default {
                 }
               })
             }
-            if (res.data.code === 200) {
+            if (infoUpdata.data.code === 200 && infoUpdata.data.code === 200) {
               this.$message({ message: '项目信息修改成功', type: 'success' })
               this.projectEditDialog = false
             } else {
               this.$message({ message: '项目信息修改失败', type: 'error' })
-              console.log('项目信息修改失败', res)
             }
-          }).catch(err => {
+          })).catch(err => {
             this.$message({ message: '网络请求发送失败', type: 'error' })
             console.log('请求发送失败', err)
           })
@@ -433,19 +435,15 @@ export default {
       const file = ev.raw
       const name = file.name
       if (!file) return
-      let reader = await upload(file)
       // 读取识别目标对象，将其编译出来
-      const worker = xlsx.read(reader, { type: 'binary' })
-      // 将返回的数据转换为json对象的数据
-      reader = xlsx.utils.sheet_to_json(worker.Sheets[worker.SheetNames[0]])
-      this.fileList.push({ name: name, data: reader, status: 'success' })
-      this.fileListData.push(reader)
+      this.projectEditingForm.fileList.push({ name: name, status: 'success', data: file })
+      this.files.push(file)
       // 将解析的数据进行字段对应，并通过接口传递至后端(根据接口的要求，确定是解析后上传还是直接上传reader的形式)
     },
     // 附件移除
     handleRemove (file, fileList) {
       this.projectEditingForm.fileList = fileList
-      this.fileListData.splice(this.fileListData.indexOf(file), 1)
+      this.files.splice(this.files.indexOf(file), 1)
     },
     // 附件超限提醒
     handleExceed (files, fileList) {

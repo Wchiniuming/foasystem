@@ -72,8 +72,8 @@ export default {
       // 获取项目详情，并初始化
       if (this.$route.params.data) {
         this.projectInfo = JSON.parse(this.$route.params.data)
-      } else if (sessionStorage.getItem('projectInfo')) { // 应对页面刷新的情况，从缓存中读取数据
-        this.projectInfo = JSON.parse(sessionStorage.getItem('projectInfo'))
+      } else if (sessionStorage.getItem('pDetailsInfo')) { // 应对页面刷新的情况，从缓存中读取数据
+        this.projectInfo = JSON.parse(sessionStorage.getItem('pDetailsInfo'))
       }
       // 根据projectId获取项目的附件信息
       getProjectAnnexes(this.projectInfo.projectId).then(res => {
@@ -100,7 +100,7 @@ export default {
     this.getData()
     // 添加刷新前的监听函数，缓存项目数据
     window.addEventListener('beforeunload', () => {
-      sessionStorage.setItem('projectInfo', JSON.stringify(this.projectInfo))
+      sessionStorage.setItem('pDetailsInfo', JSON.stringify(this.projectInfo))
     })
   }
 }

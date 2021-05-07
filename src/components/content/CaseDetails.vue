@@ -32,8 +32,17 @@
         <el-button type='text' @click="allDownLoad" v-if="allDownL">下载全部用例</el-button>
       </el-col>
       <el-col :span='4' style="width: 100%; display: flex; flex-direction: row; justify-content: end;">
-        <el-button type='primary' plain @click="caseUpload" v-if="caseUpl">导入测试用例</el-button>
-        <el-button type='primary' plain @click="modelDownload" v-if="modelDl">用例模板下载</el-button>
+        <el-upload
+          v-if="caseUpl"
+          action=""
+          accept=".xls, .xlsx"
+          :on-change="caseUpload"
+          :auto-upload="false"
+          :show-file-list='false'
+          >
+            <el-button type='primary'>测试用例上传</el-button>
+        </el-upload>
+        <el-button type='primary' plain @click="modelDownload" v-if="modelDl" style="margin-left:10px">用例模板下载</el-button>
       </el-col>
     </div>
     <table-list
@@ -111,15 +120,19 @@ export default {
     multiDownLoad () {
       this.$emit('multiDownLoad', this.selectedCases)
     },
-    allDownLoad () {
+    allDownLoad (row) {
       // 下载全量用例
-      this.$emit('allDownLoad', this.caseDataResource)
+      this.$emit('allDownLoad', row.useCaseId)
     },
     multiDelete () {
       this.$emit('multiCaseDelete', this.selectedCases)
     },
-    caseUpload () {},
-    modelDownload () {},
+    caseUpload (ev) {
+      this.$emit('uploadCase', ev)
+    },
+    modelDownload () {
+      this.$emit('useCaseModelDownload')
+    },
     caseEdit (row) {
       this.$emit('doCaseEdit', row)
     },

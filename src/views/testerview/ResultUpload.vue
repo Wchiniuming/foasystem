@@ -29,7 +29,15 @@
           </el-form-item>
         </el-col>
         <el-col :span='4' style="margin-left: 150px;" v-if="hasAuthority">
-          <el-button type='primary'>测试结果上传</el-button>
+          <el-upload
+          action=""
+          accept=".xls, .xlsx"
+          :on-change="handleCasesImport"
+          :auto-upload="false"
+          :show-file-list='false'
+          >
+            <el-button type='primary'>测试结果上传</el-button>
+          </el-upload>
         </el-col>
       </el-form>
     </div>
@@ -50,6 +58,9 @@ import CaseDetails from '@/components/content/CaseDetails'
 import { getCasesByPid } from '@/api/getData'
 import { casesDownLoad } from '@/utils/download'
 import { casesDelete } from '@/utils/delete'
+import { casesImport } from '@/api/import'
+import { upload } from '@/utils/upload'
+import { caseFormatValidate } from '@/utils/validate'
 
 export default {
   name: 'ResultUpload',
@@ -57,7 +68,8 @@ export default {
     return {
       projectInfo: {},
       // 该数据应通过后端请求得来
-      caseInfo: []
+      caseInfo: [],
+      projectId: this.$route.params.projectId
     }
   },
   components: {
@@ -71,9 +83,9 @@ export default {
   methods: {
     getData () {
       const data = {
-        projectId: this.$route.params.projectId,
+        projectId: this.projectId,
         pageNum: 1,
-        pageSize: 20
+        pageSize: 50
       }
       getCasesByPid(data).then(res => {
         if (res.data.code === 2001 || res.data.code === 2009) {
@@ -87,6 +99,7 @@ export default {
         if (res.data.code === 200) {
           this.caseInfo = res.data.data.list
         } else {
+          this.$message({ message: '数据获取失败', type: 'error' })
           console.log('数据获取失败', res)
         }
       }).catch(err => {
@@ -99,10 +112,50 @@ export default {
     },
     multiCaseDelete (selectedCases) {
       casesDelete(selectedCases, this.caseInfo, this.caseInfo, this)
+    },
+    async handleCasesImport (ev) {
+      const file = ev.raw
+      if (!file) return
+      // 解析
+      const reader = await upload(file)
+      // 校验数据信息
+      if (caseFormatValidate(reader)) {
+        // 发送请求，后端上传写入数据
+        casesImport(this.projectId, file).then(res => {
+          if (res.data.code === 200) {
+            // 上传成功时，在前端写入用例数据
+            // 将中文表头转换为程序英文表头，并将数据写入加载内容中展示
+            this.$message({
+              message: '数据导入成功！',
+              type: 'success'
+            })
+            this.getData()
+          } else {
+            this.$message({
+              message: '数据导入失败',
+              type: 'error'
+            })
+            console.log(res)
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+      } else {
+        this.$message({ message: '用例编号无需填写，或日期格式不正确，请检查！', type: 'error' })
+      }
     }
   },
   created () {
     this.getData()
+    // 设置监听及缓存，应对刷新情况
+    if (this.$route.params.data) {
+      this.projectInfo = JSON.parse(this.$route.params.data)
+    } else {
+      this.projectInfo = JSON.parse(sessionStorage.getItem('resPInfo'))
+    }
+    window.addEventListener('beforeunload', () => {
+      sessionStorage.setItem('resPInfo', JSON.stringify(this.projectInfo))
+    })
   }
 }
 </script>

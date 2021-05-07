@@ -104,7 +104,7 @@ export default {
       },
       rules: {},
       fileList: [],
-      fileListData: []
+      files: []
     }
   },
   methods: {
@@ -121,12 +121,12 @@ export default {
               })
             }
             if (res.data.code === 200) {
-              uploadFiles({ projectId: res.data.data, files: this.fileListData }).then(subRes => {
+              uploadFiles(res.data.data, this.files).then(subRes => {
                 this.$message({ message: '项目新建成功', type: 'success' })
-                setTimeout(() => { this.$router.back() }, 3000)
+                setTimeout(() => { this.$router.back() }, 2000)
               }).catch(subRes => {
                 this.$message({ message: '项目新建成功，但附件上传失败，请检查附件！', type: 'error' })
-                setTimeout(() => { this.$router.back() }, 3000)
+                setTimeout(() => { this.$router.back() }, 2000)
                 console.log('上传失败')
                 console.log(subRes)
               })
@@ -144,15 +144,15 @@ export default {
     async handleUpload (ev) {
       // 获取时间的目标对象，并解析
       const file = ev.raw
-      const name = file.name
       if (!file) return
+      const name = file.name
       let reader = await upload(file)
       // 读取识别目标对象，将其编译出来
       const worker = xlsx.read(reader, { type: 'binary' })
       // 将返回的数据转换为json对象的数据
       reader = xlsx.utils.sheet_to_json(worker.Sheets[worker.SheetNames[0]])
       this.fileList.push({ name: name, data: reader, status: 'success' })
-      this.fileListData.push(reader)
+      this.files.push(file)
       // 将解析的数据进行字段对应，并通过接口传递至后端(根据接口的要求，确定是解析后上传还是直接上传reader的形式)
     },
     doCancel (formName) {
@@ -162,7 +162,7 @@ export default {
     // 上传附件相关
     handleRemove (file, fileList) {
       this.fileList = fileList
-      this.fileListData.splice(this.fileListData.indexOf(file), 1)
+      this.files.splice(this.files.indexOf(file), 1)
     },
     handleExceed (files, fileList) {
       this.$message.warning(`当前限制选择 5 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);

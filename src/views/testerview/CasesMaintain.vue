@@ -14,6 +14,7 @@
       @doCaseDelete='deleteCase'
       @multiCaseDelete='multiCaseDelete'
       @multiDownLoad='multiDownLoad'
+      @uploadCase='uploadCase'
     ></case-details>
     <el-dialog
       :title="caseEditingForm.useCaseName"
@@ -83,6 +84,9 @@ import { updateCase } from '@/api/editData'
 import { caseEditFormRules } from '@/common/FormRules'
 import { casesDownLoad } from '@/utils/download'
 import { casesDelete } from '@/utils/delete'
+import { casesImport } from '@/api/import'
+import { upload } from '@/utils/upload'
+import { caseFormatValidate } from '@/utils/validate'
 
 export default {
   name: 'CasesMaintain',
@@ -97,15 +101,16 @@ export default {
       caseInfo: [],
       caseData: [],
       caseEditingForm: {},
-      caseEditDialog: false
+      caseEditDialog: false,
+      projectId: this.$route.params.projectId
     }
   },
   methods: {
     getData () {
       const data = {
-        projectId: this.$route.params.projectId,
+        projectId: this.projectId,
         pageNum: 1,
-        pageSize: 20
+        pageSize: 50
       }
       getCasesByPid(data).then(res => {
         if (res.data.code === 2001 || res.data.code === 2009) {
@@ -119,6 +124,7 @@ export default {
         if (res.data.code === 200) {
           this.caseInfo = res.data.data.list
           this.caseData = this.caseInfo
+          console.log(res.data.data)
         } else {
           console.log('数据获取失败', res)
         }
@@ -209,6 +215,36 @@ export default {
           console.log('网络请求失败', err)
         })
       }).catch((cancel) => {})
+    },
+    async uploadCase (ev) {
+      const file = ev.raw
+      if (!file) return
+      // 解析
+      const reader = await upload(file)
+      if (caseFormatValidate(reader)) {
+        // 发送请求，后端上传写入数据
+        casesImport(this.projectId, file).then(res => {
+          if (res.data.code === 200) {
+            // 上传成功时，在前端写入用例数据
+            // 将中文表头转换为程序英文表头，并将数据写入加载内容中展示
+            this.$message({
+              message: '数据导入成功！',
+              type: 'success'
+            })
+            this.getData()
+          } else {
+            this.$message({
+              message: '数据导入失败',
+              type: 'error'
+            })
+            console.log(res)
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+      } else {
+        this.$message({ message: '用例编号无需填写，或日期格式不正确，请检查！', type: 'error' })
+      }
     }
   },
   created () {
