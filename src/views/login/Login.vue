@@ -11,10 +11,10 @@
         <h2 class="header" style="text-align: center">业支FOA流程管理系统</h2>
         <h4 class="header" style="text-align: center">用户登录</h4>
           <el-form-item prop='userName'>
-            <el-input prefix-icon="el-icon-user-solid" v-model="loginForm.userName"></el-input>
+            <el-input prefix-icon="el-icon-user-solid" v-model.trim="loginForm.userName"></el-input>
           </el-form-item>
           <el-form-item prop='passWord'>
-            <el-input prefix-icon="el-icon-lock" type="passWord" v-model="loginForm.passWord" autocomplete="off"></el-input>
+            <el-input prefix-icon="el-icon-lock" type="passWord" v-model.trim="loginForm.passWord" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item class="control-bt">
             <el-button type="primary" size='medium' @click="onLogin('loginForm')" style="font-size: 18px;width: 85%">登 录</el-button>

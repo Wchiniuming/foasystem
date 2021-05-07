@@ -8,13 +8,13 @@
         <el-form :inline="true" :model="projQueryForm" ref='projQueryForm' class="projQuery-form" style="width:100%">
           <el-col :span='20' style="width: 100%">
             <el-form-item label='项目名称' prop='projectName'>
-              <el-input v-model="projQueryForm.projectName" placeholder="项目名称" class='itemInput' clearable></el-input>
+              <el-input v-model.trim="projQueryForm.projectName" placeholder="项目名称" class='itemInput' clearable></el-input>
             </el-form-item>
             <el-form-item label='产品' prop='productName'>
-              <el-input v-model="projQueryForm.productName" placeholder="产品" class='itemInput' clearable></el-input>
+              <el-input v-model.trim="projQueryForm.productName" placeholder="产品" class='itemInput' clearable></el-input>
             </el-form-item>
             <el-form-item label='版本' prop='productVer'>
-              <el-input v-model="projQueryForm.productVer" placeholder="版本" class='itemInput' clearable></el-input>
+              <el-input v-model.trim="projQueryForm.productVer" placeholder="版本" class='itemInput' clearable></el-input>
             </el-form-item>
             <el-form-item label="状态" prop='status'>
               <el-select v-model="projQueryForm.status" class='itemInput' placeholder="状态" clearable>
